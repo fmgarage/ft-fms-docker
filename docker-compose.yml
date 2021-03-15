@@ -1,0 +1,115 @@
+version: '3.7'
+services:
+  fmserver:
+    # image: steffenkgarage/fmserver-centos_7.8:2020-11-05
+    # image: centos-sysd-fms:2020-11-11
+    image: centos-fms-19_2:2021-03-12
+    container_name: fmserver
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # - ./data/:/opt/FileMaker/FileMaker Server/Data/Databases/
+      - ./build/:/root/build/
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    security_opt:
+      - seccomp:unconfined
+    user: root
+    environment:
+      - container=docker
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - 80:80
+      - 443:443
+      - 2399:2399
+      - 5003:5003
+      - 16000-16002:16000-16002
+    logging:
+      driver: "json-file"
+      options:
+        mode: "non-blocking"
+        max-size: "10m"
+        max-file: "5"
+    # init: true
+    # privileged: true
+    restart: "no"
+    stdin_open: true
+    tty: true
+    # command: bash
+
+  test-fmserver:
+    # image: centos-sysd-fms:2020-11-03
+    image: jrei/systemd-centos:7
+    # image: centos:7
+    container_name: test-fmserver
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./build/:/fmgserver/
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    security_opt:
+      - seccomp:unconfined
+    user: root
+    environment:
+      - container=docker
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - 80:80
+      - 443:443
+      - 2399:2399
+      - 5003:5003
+      - 16000-16002:16000-16002
+    logging:
+      driver: "json-file"
+      options:
+        mode: "non-blocking"
+        max-size: "10m"
+        max-file: "5"
+    init: true
+    # privileged: true
+    restart: "no"
+    stdin_open: true
+    tty: true
+    # command: bash
+    # command: bash /fmgserver/start.sh
+    command: /usr/sbin/init
+
+  centos7-sysd-fms-install:
+    # image: centos-sysd-fms:2020-11-03
+    image: jrei/systemd-centos:7
+    # image: centos:7
+    container_name: install-fmserver
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - ./build/:/fmgserver/
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    environment:
+      - container=docker
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - 80:80
+      - 443:443
+      - 2399:2399
+      - 5003:5003
+      - 16000-16002:16000-16002
+    logging:
+      driver: "json-file"
+      options:
+        mode: "non-blocking"
+        max-size: "10m"
+        max-file: "5"
+    # init: true
+    # privileged: true
+    restart: "no"
+    stdin_open: true
+    tty: true
+    # command: /usr/sbin/init

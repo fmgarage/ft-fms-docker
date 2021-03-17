@@ -11,7 +11,8 @@ date=$(date +%Y-%m-%d)
 
 # check if container names are in use
 docker ps -aq --filter "name=${build_image_name}" | grep -q . && echo another build container already exists && exit 1 || printf "\r"
-docker ps -aq --filter "name=fmserver" | grep -q . && echo another fmserver container already exists && exit 1 || printf "\r"
+docker ps -aq --filter "name=fmserver" | grep -q . && echo another fmserver container already exists && docker stop fmserver && docker rm fmserver || printf "\r"
+# docker ps -aq --filter "name=fmserver" | grep -q . && echo another fmserver container already exists && exit 1 || printf "\r"
 
 # build container
 docker run -d --name $build_image_name --cap-add=SYS_ADMIN --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v "${pwd}":/root/build/ jrei/systemd-centos:7

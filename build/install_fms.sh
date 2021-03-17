@@ -6,18 +6,15 @@ build_dir_mount=/root/build/
 # rpm_name=filemaker_server-19.2.1-23.x86_64.rpm
 # rpm_name=fms-linux-912.rpm
 rpm_name=fms-linux-921.rpm
-url=$(cat ${build_dir_mount}/url.txt)
+url=$(cat ${build_dir_mount}url.txt)
 package_url=$url$rpm_name
 package_remove=false
 assisted_install=assisted_install.txt
+fms_admin_user=$(grep "Admin Console User=" ${build_dir_mount}assisted_install.txt | sed 's/.*=//')
+fms_admin_pass=$(grep "Admin Console Password=" ${build_dir_mount}assisted_install.txt | sed 's/.*=//')
+cert_prefix=$(cat ${build_dir_mount}cert_prefix.txt)
 
-# color prompt global, /etc/bashrc
-
-#   comment
-# [ "$PS1" = "\\s-\\v\\\$ " ] && PS1="[\u@\h \w]\\$ "
-
-#   add
-# PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '
+# color prompt global
 echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >> /etc/bashrc
 
 # install CentOS SCLo RH repository for httpd24
@@ -49,10 +46,15 @@ FM_ASSISTED_INSTALL="${build_dir_mount}""${assisted_install}" yum install "${bui
 # check
 systemctl
 
+# import cert
+printf "\nimport certificate\n"
+fmsadmin certificate import -yu "${fms_admin_user}" -p "${fms_admin_pass}" --keyfile ${build_dir_mount}"${cert_prefix}".key --intermediateCA ${build_dir_mount}"${cert_prefix}".ca-bundle ${build_dir_mount}"${cert_prefix}".crt
+
 # remove install packages
+printf "\nremove install packages\n"
 rm -rv /root/deps/
 if [[ $package_remove ]]; then
-    rm -rv ${build_dir_mount}${rpm_name}
+    rm -r ${build_dir_mount}${rpm_name}
 fi
 
 # OR exit

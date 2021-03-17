@@ -3,7 +3,7 @@ services:
   fmserver:
     # image: steffenkgarage/fmserver-centos_7.8:2020-11-05
     # image: centos-sysd-fms:2020-11-11
-    image: centos-fms-19_2:2021-03-12
+    image: centos-fms-19_2:2021-03-17
     container_name: fmserver
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro

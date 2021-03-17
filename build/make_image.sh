@@ -30,11 +30,11 @@ docker stop $build_image_name && docker rm $build_image_name
 
 # start fmserver
 # TODO mount Databases
-printf "\nstart filemaker server container ...\n"
-docker run -d --name fmserver --cap-add=SYS_ADMIN --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 5003:5003 -p 16000-16002:16000-16002 -p 80:80 -p 443:443 $image_name:latest || exit 1
+# printf "\nstart filemaker server container ...\n"
+# docker run -d --name fmserver --cap-add=SYS_ADMIN --tmpfs /tmp --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 5003:5003 -p 16000-16002:16000-16002 -p 80:80 -p 443:443 $image_name:latest || exit 1
 
 # check
 # printf "\ncheck port 16000 ...\n"
 # curl 127.0.0.1:16000
 
-printf "\nfilemaker server is running\n"
+printf "\ndone\n"

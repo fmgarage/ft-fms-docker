@@ -6,15 +6,26 @@ build_dir_mount=/root/build/
 # rpm_name=filemaker_server-19.2.1-23.x86_64.rpm
 # rpm_name=fms-linux-912.rpm
 rpm_name=fms-linux-921.rpm
-url=$(cat url.txt)
+url=$(cat ${build_dir_mount}/url.txt)
 package_url=$url$rpm_name
 package_remove=false
 assisted_install=assisted_install.txt
 
+# color prompt global, /etc/bashrc
+
+#   comment
+# [ "$PS1" = "\\s-\\v\\\$ " ] && PS1="[\u@\h \w]\\$ "
+
+#   add
+# PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '
+echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >> /etc/bashrc
 
 # install CentOS SCLo RH repository for httpd24
 yum install centos-release-scl -y
 # yum install centos-release-scl-rh -y
+
+# update
+yum update -y
 
 # pre packages, possibly omit sudo, autofs
 yum install bash-completion NetworkManager firewalld nano policycoreutils net-tools httpd24 httpd24-mod_ssl -y

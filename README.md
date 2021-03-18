@@ -3,8 +3,13 @@ Run FileMaker Server for Linux in Docker
 
 Scripts to automatically build a ready-to-run Docker image
 
+run: `./build/make_image.sh`
+
 requires:
-- assisted_install.txt - for headless setup
+- assisted_install file - for headless setup
 - SSL/TLS certificates
-- cert_prefix.txt - naming of your certificates
-- url.txt - fms package download URL
+- config.txt - naming of your certificates, fms package download URL, name of assisted install file
+
+#### todo:
+
+- Database Folder

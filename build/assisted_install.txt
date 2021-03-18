@@ -1,0 +1,13 @@
+[Assisted Install]
+
+License Accepted=1
+
+Deployment Options=0
+
+Admin Console User=user
+
+Admin Console Password=password
+
+Admin Console PIN=0000
+
+License Certificate Path=/root/build/LicenseCert.fmcert

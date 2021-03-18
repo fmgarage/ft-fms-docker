@@ -1,0 +1,3 @@
+url=https://domain.com/path-to-install-package/
+cert_prefix=my-certificate
+assisted_install=assisted_install.txt

@@ -1,12 +1,11 @@
 version: '3.7'
 services:
-  fmserver:
-    # image: centos-sysd-fms:2020-11-11
-    image: centos-fms-19_2:2021-03-18
-    container_name: fmserver
+  fms-c:
+    image: centos-fms-c-19_2:latest
+    container_name: fms-c
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      # - ./data/:/opt/FileMaker/FileMaker Server/Data/Databases/
+      - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
       # - ./build/:/root/build/
     tmpfs:
       - /tmp
@@ -25,6 +24,9 @@ services:
       - 2399:2399
       - 5003:5003
       - 16000-16002:16000-16002
+    networks:
+      fms:
+        ipv4_address: 172.20.0.11
     logging:
       driver: "json-file"
       options:
@@ -38,14 +40,13 @@ services:
     tty: true
     # command: bash
 
-  test-fmserver:
-    # image: centos-sysd-fms:2020-11-03
-    image: jrei/systemd-centos:7
-    # image: centos:7
-    container_name: test-fmserver
+  fms:
+    image: centos-fms-19_2:latest
+    container_name: fms
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ./build/:/fmgserver/
+      - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
+      # - ./build/:/root/build/
     tmpfs:
       - /tmp
       - /run
@@ -63,43 +64,9 @@ services:
       - 2399:2399
       - 5003:5003
       - 16000-16002:16000-16002
-    logging:
-      driver: "json-file"
-      options:
-        mode: "non-blocking"
-        max-size: "10m"
-        max-file: "5"
-    init: true
-    # privileged: true
-    restart: "no"
-    stdin_open: true
-    tty: true
-    # command: bash
-    # command: bash /fmgserver/start.sh
-    command: /usr/sbin/init
-
-  centos7-sysd-fms-install:
-    # image: centos-sysd-fms:2020-11-03
-    image: jrei/systemd-centos:7
-    # image: centos:7
-    container_name: install-fmserver
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ./build/:/fmgserver/
-    tmpfs:
-      - /tmp
-      - /run
-      - /run/lock
-    environment:
-      - container=docker
-    cap_add:
-      - SYS_ADMIN
-    ports:
-      - 80:80
-      - 443:443
-      - 2399:2399
-      - 5003:5003
-      - 16000-16002:16000-16002
+    networks:
+      fms:
+        ipv4_address: 172.20.0.11
     logging:
       driver: "json-file"
       options:
@@ -111,4 +78,73 @@ services:
     restart: "no"
     stdin_open: true
     tty: true
-    # command: /usr/sbin/init
+    # command: bash
+
+  d-fms2.fmgarage.com:
+    # image: centos-sysd-fms:2020-11-11
+    image: centos-fms-19_2:2021-03-25
+    container_name: fms2
+    hostname: d-fms2.fmgarage.com
+    depends_on:
+      - reverse
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # - ./data/:/opt/FileMaker/FileMaker Server/Data/Databases/
+      # - ./build/:/root/build/
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    security_opt:
+      - seccomp:unconfined
+    user: root
+    environment:
+      - container=docker
+    cap_add:
+      - SYS_ADMIN
+    # ports:
+    #   - 80:80
+    #   - 443:443
+    #   - 2399:2399
+    #   - 5003:5003
+    #   - 16000-16002:16000-16002
+    networks:
+      fms:
+        ipv4_address: 172.20.0.12
+    logging:
+      driver: "json-file"
+      options:
+        mode: "non-blocking"
+        max-size: "10m"
+        max-file: "5"
+    # init: true
+    # privileged: true
+    restart: "no"
+    stdin_open: true
+    tty: true
+    # command: bash
+
+  reverse:
+    container_name: reverse
+    hostname: reverse
+    image: nginx
+    ports:
+      - 80:80
+      - 443:443
+      - 5003:5003
+      - 16000:16000
+    networks:
+      fms:
+        ipv4_address: 172.20.0.50
+    volumes:
+      - ./nginx_config:/etc/nginx
+      - ./nginx_cert/:/etc/ssl/fmg/
+    # command: bash
+
+networks:
+    fms:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+            - subnet: 172.20.0.0/16

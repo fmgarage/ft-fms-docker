@@ -1,3 +1,8 @@
-url=https://domain.com/path-to-install-package/
-cert_prefix=my-certificate
+# download URL for the fms install package. Only needed when local file is not found.
+url=https://path/to/install-package
+
+# filename of .crt and .key TLS files. Leave empty to not install a certificate.
+cert_prefix=name_of_certificate
+
+# name of file with assisted install instructions
 assisted_install=assisted_install.txt

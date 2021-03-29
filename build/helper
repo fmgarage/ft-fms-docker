@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
+
 # settings
 build_dir_mount=/root/build/
-# url=$(grep "url=" ${build_dir_mount}config.txt | sed 's/.*=//')
-cert_prefix=$(grep "cert_prefix=" ${build_dir_mount}config.txt | sed 's/.*=//')
-# package_url=$url
+
+cert_prefix=$CERT_PREFIX
+assisted_install=$ASSISTED_INSTALL
+fms_admin_user=$FMS_ADMIN_USER
+fms_admin_pass=$FMS_ADMIN_PASS
 package_remove=$(find "$build_dir_mount" -name package_remove)
-assisted_install=$(grep "assisted_install=" ${build_dir_mount}config.txt | sed 's/.*=//')
-fms_admin_user=$(grep "Admin Console User=" ${build_dir_mount}"${assisted_install}" | sed 's/.*=//')
-fms_admin_pass=$(grep "Admin Console Password=" ${build_dir_mount}"${assisted_install}" | sed 's/.*=//')
 
 # color prompt global
 echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >> /etc/bashrc
@@ -44,7 +44,7 @@ systemctl
 # import cert
 if [[ $cert_prefix ]]; then
     printf "\nimport certificate\n"
-    fmsadmin certificate import -yu "${fms_admin_user}" -p "${fms_admin_pass}" --keyfile ${build_dir_mount}"${cert_prefix}".key --intermediateCA ${build_dir_mount}"${cert_prefix}".ca-bundle ${build_dir_mount}"${cert_prefix}".crt
+    fmsadmin certificate import -yu "${fms_admin_user}" -p "${fms_admin_pass}" --keyfile ${build_dir_mount}"${cert_prefix}".pem --intermediateCA ${build_dir_mount}"${cert_prefix}".ca-bundle ${build_dir_mount}"${cert_prefix}".crt || exit 1
 fi
 
 # remove install packages

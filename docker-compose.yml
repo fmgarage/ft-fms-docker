@@ -5,7 +5,7 @@ services:
     container_name: fms-c
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
+      # - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
       # - ./build/:/root/build/
     tmpfs:
       - /tmp
@@ -45,7 +45,7 @@ services:
     container_name: fms
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
+      # - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
       # - ./build/:/root/build/
     tmpfs:
       - /tmp

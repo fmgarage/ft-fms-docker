@@ -56,8 +56,8 @@ if [[ $c_cert ]] && [[ $c_bundle ]] && [[ $c_key ]]; then
 fi
 
 # default fms config
-fmsadmin set serverconfig SecureFilesOnly=false
-fmsadmin disable schedule1
+fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" set serverconfig SecureFilesOnly=false || exit 1
+fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" disable schedule1 || exit 1
 
 # remove install packages
 printf "\nremove install packages\n"

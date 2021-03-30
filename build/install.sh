@@ -24,8 +24,10 @@ c_bundle=$(find . -name "*.ca-bundle")
 if [[ ! $c_bundle ]]; then
     c_bundle=$(get_setting "ca-bundle" ./config.txt)
     check_setting "$c_bundle"
-    cp -v "$c_bundle" . || exit 1
-    c_bundle=${c_bundle##*/}
+    if [[ $c_bundle ]]; then
+        cp -v "$c_bundle" . || exit 1
+        c_bundle=${c_bundle##*/}
+    fi
 
 fi
 
@@ -33,16 +35,20 @@ c_cert=$(find . -name "*.crt")
 if [[ ! $c_cert ]] ; then
     c_cert=$(get_setting "certificate" ./config.txt)
     check_setting "$c_cert"
-    cp -v "$c_cert" . || exit 1
-    c_cert=${c_cert##*/}
+    if [[ $c_cert ]]; then
+        cp -v "$c_cert" . || exit 1
+        c_cert=${c_cert##*/}
+    fi
 fi
 
 c_key=$(find . -name "*.pem")
 if [[ ! $c_key ]]; then
     c_key=$(get_setting "key-file" ./config.txt)
     check_setting "$c_key"
-    cp -v "$c_key" . || exit 1
-    c_key=${c_key##*/}
+    if [[ $c_key ]]; then
+        cp -v "$c_key" . || exit 1
+        c_key=${c_key##*/}
+    fi
 fi
 
 # get settings from config
@@ -51,6 +57,7 @@ fi
 
 assisted_install=$(get_setting "assisted_install" ./config.txt)
 check_setting "$assisted_install"
+# todo not found
 
 start_server=$(get_setting "start_server" ./config.txt)
 

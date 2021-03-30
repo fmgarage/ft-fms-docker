@@ -57,14 +57,14 @@ fi
 
 # default fms config
 fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" set serverconfig SecureFilesOnly=false || exit 1
-fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" disable schedule1 || exit 1
+fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" -y disable schedule 1 || exit 1
 
 # remove install packages
 printf "\nremove install packages\n"
 rm -r /root/deps/
 if [[ $package_remove -eq 1 ]]; then
     printf "\nremove fms package\n"
-    rm -r "${package}" "$package_remove"
+    rm -r "${package}" || exit 1
 fi
 
 echo "" > ${build_dir_mount}build_success

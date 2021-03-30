@@ -102,7 +102,7 @@ fi
 
 # check if container names are in use
 docker ps -aq --filter "name=${build_image_name}" | grep -q . && echo another build container already exists, removing... && docker stop $build_image_name && docker rm $build_image_name || printf "\r"
-docker ps -aq --filter "name=fmserver" | grep -q . && echo another fmserver container already exists, removing... && docker stop fmserver && docker rm fmserver || printf "\r"
+docker ps -aq --filter "name=${service_name}" | grep -q . && echo another ${service_name} container already exists, removing... && docker stop ${service_name} && docker rm ${service_name} || printf "\r"
 
 
 # build container
@@ -124,12 +124,18 @@ docker run -d \
 
 # run install script in build container
 docker exec -ti $build_image_name /root/build/helper
-# docker exec -ti $build_image_name /root/build/install_fms.sh
+if [ ! $? ]; then
+    printf "error while installing!" && docker stop $build_image_name && docker rm $build_image_name && exit 1
+fi
+# docker exec -ti $build_image_name /root/build/helper || printf "error while installing!" && docker stop $build_image_name && docker rm $build_image_name && exit 1
+
 
 # check for flag file
 build_success=$(find . -name build_success)
 if [[ ! $build_success ]]; then
     echo "build not successful"
+    docker stop $build_image_name
+    docker rm $build_image_name
     exit 1
 fi
 
@@ -138,7 +144,15 @@ rm "$build_success" || exit 1
 
 # docker commit
 printf "\ncommit build container to new image ...\n"
-docker commit -c "EXPOSE 80" -c "EXPOSE 443" -c "EXPOSE 2399" -c "EXPOSE 5003" -c "EXPOSE 16000-16002" "${build_image_name}" "${image_name}":"${date}"
+docker commit -c "EXPOSE 80" -c "EXPOSE 443" -c "EXPOSE 2399" -c "EXPOSE 5003" -c "EXPOSE 16000-16002" \
+    --change "ENV CERT_CERT=''" \
+    --change "ENV CERT_BUNDLE=''" \
+    --change "ENV CERT_KEY=''" \
+    --change "ENV PACKAGE_REMOVE=''" \
+    --change "ENV ASSISTED_INSTALL=''" \
+    --change "ENV FMS_ADMIN_USER=''" \
+    --change "ENV FMS_ADMIN_PASS=''" \
+    "${build_image_name}" "${image_name}":"${date}"
 docker tag $image_name:"${date}" "${image_name}":latest
 
 # remove $build...

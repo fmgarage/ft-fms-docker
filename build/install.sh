@@ -85,10 +85,10 @@ package=$(find . -name "*.rpm")
 plines=$(wc -l <<< "$package" )
 if [[ ! $package ]]; then
     printf "\ndownloading fms package ...\n"
-    url=$(get_setting "url")
+    url=$(get_setting "url" ./config.txt)
         STATUS=$(curl -s --head --output /dev/null -w '%{http_code}' "$url")
         if [ ! $STATUS -eq 200 ]; then
-            echo "Got a $STATUS from $url ..."
+            echo "Got a $STATUS from URL: $url ..."
             exit
         fi
     curl "${url}" -O || exit

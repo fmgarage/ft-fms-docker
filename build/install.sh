@@ -8,7 +8,7 @@ cd "$pwd" || exit
 
 # parse config
 function get_setting {
-    grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/ //g'
+    grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
 }
 
 function check_setting {
@@ -17,39 +17,63 @@ function check_setting {
         exit 1
     fi
 }
-# debug
-echo settings...
+
+
+# find certificates
+c_bundle=$(find . -name "*.ca-bundle")
+if [[ ! $c_bundle ]]; then
+    c_bundle=$(get_setting "ca-bundle" ./config.txt)
+    check_setting "$c_bundle"
+    cp -v "$c_bundle" . || exit 1
+    c_bundle=${c_bundle##*/}
+
+fi
+
+c_cert=$(find . -name "*.crt")
+if [[ ! $c_cert ]] ; then
+    c_cert=$(get_setting "certificate" ./config.txt)
+    check_setting "$c_cert"
+    cp -v "$c_cert" . || exit 1
+    c_cert=${c_cert##*/}
+fi
+
+c_key=$(find . -name "*.pem")
+if [[ ! $c_key ]]; then
+    c_key=$(get_setting "key-file" ./config.txt)
+    check_setting "$c_key"
+    cp -v "$c_key" . || exit 1
+    c_key=${c_key##*/}
+fi
 
 # get settings from config
-# debug
-echo settings cert...
-cert_prefix=$(get_setting "cert_prefix" ./config.txt)
-check_setting "$cert_prefix"
+# cert_prefix=$(get_setting "cert_prefix" ./config.txt)
+# check_setting "$cert_prefix"
 
-# debug
-echo settings assist...
 assisted_install=$(get_setting "assisted_install" ./config.txt)
 check_setting "$assisted_install"
-# debug
-echo settings assisted_install...
+
+start_server=$(get_setting "start_server" ./config.txt)
 
 admin_user=$(get_setting "Admin Console User" ./"$assisted_install")
 admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 
 
-if [[ ! $cert_prefix ]]; then
+if [[ ! $c_cert ]] || [[ ! $c_bundle ]] || [[ ! $c_key ]]; then
     image_name=centos-fms-19_2
+    service_name=fms
 else
     image_name=centos-fms-c-19_2
+    service_name=fms-c
 fi
 
 build_image_name=fmsinstall
-# todo pin version tag or is 7 sufficient?
+# todo pin version tag or is 7 ok?
 base_image=jrei/systemd-centos:7
 date=$(date +%Y-%m-%d)
 
 # check install package
 # download filemaker_server package
+package_remove=0
 package=$(find . -name "*.rpm")
 plines=$(wc -l <<< "$package" )
 if [[ ! $package ]]; then
@@ -61,8 +85,8 @@ if [[ ! $package ]]; then
             exit
         fi
     curl "${url}" -O || exit
-    echo "" > ./package_remove
-    # package=$(find . -name "*.rpm")
+    # echo "" > ./package_remove
+    package_remove=1
 elif [[ $plines -gt 1 ]]; then
     printf "%s rpm packages found, 1 expected" "$plines"
     exit 1
@@ -78,7 +102,9 @@ docker ps -aq --filter "name=fmserver" | grep -q . && echo another fmserver cont
 docker run -d \
     --name $build_image_name \
     --cap-add=SYS_ADMIN \
-    -e CERT_PREFIX="$cert_prefix" \
+    -e CERT_CERT="$c_cert" \
+    -e CERT_BUNDLE="$c_bundle" \
+    -e CERT_KEY="$c_key" \
     -e PACKAGE_REMOVE="$package_remove" \
     -e ASSISTED_INSTALL="$assisted_install" \
     -e FMS_ADMIN_USER="$admin_user" \
@@ -112,4 +138,12 @@ docker tag $image_name:"${date}" "${image_name}":latest
 printf "\nremoving build container ...\n"
 docker stop $build_image_name && docker rm $build_image_name
 
-printf "\nDone. You can now start your server with \e[34mdocker-compose up [-d] fms\e[39m or \e[34mfms-c\e[39m if you installed certificates.\n"
+if [[ $start_server -eq 1 ]]; then
+    printf "\nDone. Now starting your server ....\n"
+    docker-compose up -d $service_name
+else
+    printf "\nDone. You can now start your server with \e[34mdocker-compose up [-d] %s\e[39m\n" "service_name"
+fi
+
+
+

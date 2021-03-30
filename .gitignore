@@ -1,3 +1,5 @@
+build/assisted_install.txt
+build/config.txt
 *.ca-bundle
 *.crt
 *.key

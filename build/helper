@@ -4,11 +4,19 @@
 # settings
 build_dir_mount=/root/build/
 
-cert_prefix=$CERT_PREFIX
+# cert_prefix=$CERT_PREFIX
+c_cert=$CERT_CERT
+c_bundle=$CERT_BUNDLE
+c_key=$CERT_KEY
+
 assisted_install=$ASSISTED_INSTALL
 fms_admin_user=$FMS_ADMIN_USER
 fms_admin_pass=$FMS_ADMIN_PASS
-package_remove=$(find "$build_dir_mount" -name package_remove)
+# package_remove=$(find "$build_dir_mount" -name package_remove)
+package_remove=$PACKAGE_REMOVE
+
+# unset envs
+unset CERT_CERT CERT_BUNDLE CERT_KEY ASSISTED_INSTALL FMS_ADMIN_USER FMS_ADMIN_PASS PACKAGE_REMOVE || exit 1
 
 # color prompt global
 echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >> /etc/bashrc
@@ -42,15 +50,19 @@ FM_ASSISTED_INSTALL="${build_dir_mount}""${assisted_install}" yum install "${pac
 systemctl
 
 # import cert
-if [[ $cert_prefix ]]; then
+if [[ $c_cert ]] && [[ $c_bundle ]] && [[ $c_key ]]; then
     printf "\nimport certificate\n"
-    fmsadmin certificate import -yu "${fms_admin_user}" -p "${fms_admin_pass}" --keyfile ${build_dir_mount}"${cert_prefix}".pem --intermediateCA ${build_dir_mount}"${cert_prefix}".ca-bundle ${build_dir_mount}"${cert_prefix}".crt || exit 1
+    fmsadmin certificate import -yu "${fms_admin_user}" -p "${fms_admin_pass}" --keyfile ${build_dir_mount}"${c_key}" --intermediateCA ${build_dir_mount}"${c_bundle}" ${build_dir_mount}"${c_cert}" || exit 1
 fi
+
+# default fms config
+fmsadmin set serverconfig SecureFilesOnly=false
+fmsadmin disable schedule1
 
 # remove install packages
 printf "\nremove install packages\n"
 rm -r /root/deps/
-if [[ $package_remove ]]; then
+if [[ $package_remove -eq 1 ]]; then
     printf "\nremove fms package\n"
     rm -r "${package}" "$package_remove"
 fi

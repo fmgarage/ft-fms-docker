@@ -20,6 +20,7 @@ function check_setting {
 
 
 # find certificates
+# todo: shorten
 c_bundle=$(find . -name "*.ca-bundle")
 if [[ ! $c_bundle ]]; then
     c_bundle=$(get_setting "ca-bundle" ./config.txt)
@@ -52,8 +53,6 @@ if [[ ! $c_key ]]; then
 fi
 
 # get settings from config
-# cert_prefix=$(get_setting "cert_prefix" ./config.txt)
-# check_setting "$cert_prefix"
 
 assisted_install=$(get_setting "assisted_install" ./config.txt)
 check_setting "$assisted_install"

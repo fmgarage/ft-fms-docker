@@ -7,6 +7,16 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       # - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
       # - ./build/:/root/build/
+      # - ./fms-data/Data/Preferences:/opt/FileMaker/FileMaker Server/Data/Preferences
+      # - ./fms-data/Data/Databases:/opt/FileMaker/FileMaker Server/Data/Databases
+      # - ./fms-data/Web Publishing/conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf
+      # - ./fms-data/conf:/opt/FileMaker/FileMaker Server/conf
+      # - ./fms-data/Admin/conf:/opt/FileMaker/FileMaker Server/Admin/conf
+      # - ./fms-data/Logs:/opt/FileMaker/FileMaker Server/Logs
+      # - ./fms-data/Database Server/Extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions
+      # - ./fms-data/HTTPServer/conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf
+      # - ./fms-data/HTTPServer/logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs
+      # - ./fms-data/HTTPServer/.conf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf
     tmpfs:
       - /tmp
       - /run
@@ -47,6 +57,16 @@ services:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       # - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
       # - ./build/:/root/build/
+      # - ./fms-data/Data/Preferences:/opt/FileMaker/FileMaker Server/Data/Preferences
+      # - ./fms-data/Data/Databases:/opt/FileMaker/FileMaker Server/Data/Databases
+      # - ./fms-data/Web Publishing/conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf
+      # - ./fms-data/conf:/opt/FileMaker/FileMaker Server/conf
+      # - ./fms-data/Admin/conf:/opt/FileMaker/FileMaker Server/Admin/conf
+      # - ./fms-data/Logs:/opt/FileMaker/FileMaker Server/Logs
+      # - ./fms-data/Database Server/Extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions
+      # - ./fms-data/HTTPServer/conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf
+      # - ./fms-data/HTTPServer/logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs
+      # - ./fms-data/HTTPServer/.conf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf
     tmpfs:
       - /tmp
       - /run

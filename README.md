@@ -10,7 +10,7 @@ Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything 
 
 ### Docker Desktop
 
-Download and install Docker Desktop
+Download and install the latest version of Docker Desktop.
 
 
 
@@ -46,9 +46,15 @@ If you have a certificate that you might want to use for this server, simply cop
 
 ### Build Image and run Container
 
-Open Terminal.app, drag the **install.sh** into the terminal window and hit return (You may want to get a fresh coffee now).
+Open Terminal.app, drag the **install.sh** into the terminal window and hit return.
 
 After the install process is finished, check the Dashboard in Docker Desktop, there should be a running container named **fms** (fmc-c if installed with a certificate).
+
+Open the admin console by clicking the *Open in Browser* button in the container actions. If you installed without certificate you will have to confirm the self-signed one.
+
+Clicking the CLI button will open a terminal window where you can use the fmsadmin command to control your server.
+
+
 
 
 
@@ -61,4 +67,18 @@ After the install process is finished, check the Dashboard in Docker Desktop, th
 In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10
 
 Download and install a Linux distribution of your preference and run it. 
+
+
+
+
+
+## Administration
+
+
+
+### Stopping and Restarting the Server
+
+At the moment, stopping the container or quitting Docker Desktop will not gracefully close your databases or stop the server. To prevent your databases from being currupted by the hard shutdown, always use the *fmsadmin stop server* command beforehand.
+
+## 
 

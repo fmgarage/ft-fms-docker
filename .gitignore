@@ -3,3 +3,4 @@
 *.key
 *.pem
 *.rpm
+.idea

@@ -22,7 +22,7 @@ unset CERT_CERT CERT_BUNDLE CERT_KEY ASSISTED_INSTALL FMS_ADMIN_USER FMS_ADMIN_P
 echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >> /etc/bashrc
 
 # install CentOS SCLo repository for httpd24
-yum install centos-release-scl -y || exit 1
+yum install centos-release-scl deltarpm -y || exit 1
 
 # update
 yum update -y

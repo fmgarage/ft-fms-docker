@@ -57,18 +57,17 @@ services:
     hostname: fms
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      # - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
-      # - ./build/:/root/build/
-      # - ./fms-data/Admin/conf:/opt/FileMaker/FileMaker Server/Admin/conf
-      # - ./fms-data/conf:/opt/FileMaker/FileMaker Server/conf
-      # - ./fms-data/Data/Databases:/opt/FileMaker/FileMaker Server/Data/Databases
-      # - ./fms-data/Data/Preferences:/opt/FileMaker/FileMaker Server/Data/Preferences
-      # - ./fms-data/Database Server/Extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions
-      # - ./fms-data/HTTPServer/.conf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf
-      # - ./fms-data/HTTPServer/conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf
-      # - ./fms-data/HTTPServer/logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs
-      # - ./fms-data/Logs:/opt/FileMaker/FileMaker Server/Logs
-      # - ./fms-data/Web Publishing/conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf
+      - data-admin-conf:/opt/FileMaker/FileMaker Server/Admin/conf:delegated
+      - data-conf:/opt/FileMaker/FileMaker Server/conf:delegated
+      - data-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
+      - data-data-databases:/opt/FileMaker/FileMaker Server/Data/Databases/:delegated
+      - data-data-preferences:/opt/FileMaker/FileMaker Server/Data/Preferences/:delegated
+      - data-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
+      - data-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
+      - data-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
+      - data-http-logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs:delegated
+      - data-logs:/opt/FileMaker/FileMaker Server/Logs:delegated
+      - data-webpub-conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf:delegated
     tmpfs:
       - /tmp
       - /run
@@ -172,3 +171,29 @@ networks:
             driver: default
             config:
             - subnet: 172.20.0.0/16
+
+volumes:
+#  tmpvolume:
+#    external: true
+  data-admin-conf:
+    external: true
+  data-dbserver-extensions:
+    external: true
+  data-data-backups:
+    external: true
+  data-data-databases:
+    external: true
+  data-data-preferences:
+    external: true
+  data-conf:
+    external: true
+  data-http-dotconf:
+    external: true
+  data-http-conf:
+    external: true
+  data-http-logs:
+    external: true
+  data-logs:
+    external: true
+  data-webpub-conf:
+    external: true

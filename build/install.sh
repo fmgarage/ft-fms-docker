@@ -1,24 +1,26 @@
 #!/usr/bin/env bash
+##!/bin/bash
 
 # go to working dir
-pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit
-cd "$pwd" || exit
+pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
+cd "$pwd" || exit 1
 parent_dir=$(dirname "${pwd}")
 inside_base_path="/opt/FileMaker/FileMaker Server/"
 
-# volume-paths associative array
-declare -A paths
-paths["data-admin-conf"]="/Admin/conf/"
-paths["data-data-backups"]="/Data/Backups/"
-paths["data-data-databases"]="/Data/Databases/"
-paths["data-data-preferences"]="/Data/Preferences/"
-paths["data-dbserver-extensions"]="/Database Server/Extensions/"
-paths["data-conf"]="/conf/"
-paths["data-http-dotconf"]="/HTTPServer/.conf/"
-paths["data-http-conf"]="/HTTPServer/conf/"
-paths["data-http-logs"]="/HTTPServer/logs/"
-paths["data-logs"]="/Logs/"
-paths["data-webpub-conf"]="/Web Publishing/conf/"
+# volume-paths array
+paths=( \
+  "data-admin-conf" "/Admin/conf/" \
+  "data-data-backups" "/Data/Backups/" \
+  "data-data-databases" "/Data/Databases/" \
+  "data-data-preferences" "/Data/Preferences/" \
+  "data-dbserver-extensions" "/Database Server/Extensions/"
+  "data-conf" "/conf/" \
+  "data-http-dotconf" "/HTTPServer/.conf/"
+  "data-http-conf" "/HTTPServer/conf/" \
+  "data-http-logs" "/HTTPServer/logs/"
+  "data-logs" "/Logs/" \
+  "data-webpub-conf" "/Web Publishing/conf/"
+)
 
 # parse config
 function get_setting() {
@@ -114,21 +116,24 @@ while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
   echo Another ${service_name} container already exists, remove and build a new image? [y/n]
   read remove_service
 
-  if [[ $remove_service == @(Y|y) ]]; then
-    is_valid=1
-    rm_service=1
-  elif [[ $remove_service == @(N|n) ]]; then
-    is_valid=1
-    rm_service=0
-  else
-    echo Please enter [y]es or [n]o
-  fi
+  case $remove_service in
+    Y|y)
+      is_valid=1
+      rm_service=1
+      ;;
+    N|n)
+      is_valid=1
+      rm_service=0
+      ;;
+    *)
+      echo Please enter [y]es or [n]o
+  esac
 done
 
-if [ $rm_service -eq 1 ]; then
+if [ $old_container -eq 1 ] && [ $rm_service -eq 1 ]; then
   printf "\nremoving...\n"
   docker stop ${service_name} && docker rm ${service_name} || printf "\r"
-else
+elif [ $old_container -eq 1 ] && [ $rm_service -eq 0 ]; then
   printf "\n Exiting.\n"
   exit 0
 fi
@@ -137,22 +142,23 @@ docker ps -aq --filter "name=${build_image_name}" | grep -q . && echo another bu
 
 # create bind volumes
 printf "\n\e[34mCreating directories on host...\e[39m\n"
-for path in "${paths[@]}"; do
-  if [[ ! -d "$parent_dir/fms-data${path}" ]]; then
-    mkdir -p -- "$parent_dir/fms-data${path}"
+for (( i=1; i<"${#paths[@]}"; i+=2 )); do
+  if [[ ! -d "$parent_dir/fms-data${paths[$i]}" ]]; then
+    mkdir -p -- "$parent_dir/fms-data${paths[$i]}"
   fi
 done
 
 printf "\n\e[34mcreating volumes...\e[39m\n"
-for vol in "${!paths[@]}"; do
-  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data/${paths["$vol"]}" "$vol" || {
+for (( i=0; i<"${#paths[@]}"; i+=2 )); do
+  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data/${paths[$i+1]}" "${paths[$i]}" || {
     printf "error while creating docker volumes"
     exit 1
   }
 done
 
 printf "\n"
-# build container
+
+# run build container
 docker run -d \
   --name $build_image_name \
   --cap-add=SYS_ADMIN \
@@ -184,7 +190,7 @@ docker run -d \
   exit 1
 }
 
-# run install script in build container
+# run install script inside build container
 docker exec -ti $build_image_name /root/build/helper
 if [ ! $? ]; then
   printf "error while installing!"
@@ -222,13 +228,6 @@ docker tag $image_name:"${date}" "${image_name}":latest
 # remove $build...
 printf "\nremoving build container ...\n"
 docker stop $build_image_name && docker rm $build_image_name
-
-# TODO
-# remove build directory (maybe keep configs, only remove scripts)
-#if [ $remove_build_dir -eq 1 ]; then
-#    rm install.sh helper
-#fi
-
 
 if [[ $start_server -eq 1 ]]; then
   printf "\nDone. Now starting your server ....\n"

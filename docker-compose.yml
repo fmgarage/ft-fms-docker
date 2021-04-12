@@ -6,17 +6,17 @@ services:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       # - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
-      # - ./build/:/root/build/
-      # - ./fms-data/Data/Preferences:/opt/FileMaker/FileMaker Server/Data/Preferences
-      # - ./fms-data/Data/Databases:/opt/FileMaker/FileMaker Server/Data/Databases
-      # - ./fms-data/Web Publishing/conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf
-      # - ./fms-data/conf:/opt/FileMaker/FileMaker Server/conf
-      # - ./fms-data/Admin/conf:/opt/FileMaker/FileMaker Server/Admin/conf
-      # - ./fms-data/Logs:/opt/FileMaker/FileMaker Server/Logs
-      # - ./fms-data/Database Server/Extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions
-      # - ./fms-data/HTTPServer/conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf
-      # - ./fms-data/HTTPServer/logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs
-      # - ./fms-data/HTTPServer/.conf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf
+      - data-admin-conf:/opt/FileMaker/FileMaker Server/Admin/conf:delegated
+      - data-conf:/opt/FileMaker/FileMaker Server/conf:delegated
+      - data-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
+      - data-data-databases:/opt/FileMaker/FileMaker Server/Data/Databases/:delegated
+      - data-data-preferences:/opt/FileMaker/FileMaker Server/Data/Preferences/:delegated
+      - data-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
+      - data-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
+      - data-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
+      - data-http-logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs:delegated
+      - data-logs:/opt/FileMaker/FileMaker Server/Logs:delegated
+      - data-webpub-conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf:delegated
     tmpfs:
       - /tmp
       - /run

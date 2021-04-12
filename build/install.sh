@@ -69,6 +69,7 @@ assisted_install=$(get_setting "assisted_install" ./config.txt)
 check_setting "$assisted_install"
 # todo not found
 start_server=$(get_setting "start_server" ./config.txt)
+remove_build_dir=$(get_setting "remove_build_dir" ./config.txt)
 admin_user=$(get_setting "Admin Console User" ./"$assisted_install")
 admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 
@@ -105,8 +106,34 @@ elif [[ $plines -gt 1 ]]; then
 fi
 
 # check if container names are in use
+old_container=0
+rm_service=0
+docker ps -aq --filter "name=${service_name}" | grep -q . && old_container=1
+is_valid=0
+while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
+  echo Another ${service_name} container already exists, remove and build a new image? [y/n]
+  read remove_service
+
+  if [[ $remove_service == @(Y|y) ]]; then
+    is_valid=1
+    rm_service=1
+  elif [[ $remove_service == @(N|n) ]]; then
+    is_valid=1
+    rm_service=0
+  else
+    echo Please enter [y]es or [n]o
+  fi
+done
+
+if [ $rm_service -eq 1 ]; then
+  printf "\nremoving...\n"
+  docker stop ${service_name} && docker rm ${service_name} || printf "\r"
+else
+  printf "\n Exiting.\n"
+  exit 0
+fi
+
 docker ps -aq --filter "name=${build_image_name}" | grep -q . && echo another build container already exists, removing... && docker stop $build_image_name && docker rm $build_image_name || printf "\r"
-docker ps -aq --filter "name=${service_name}" | grep -q . && echo another ${service_name} container already exists, removing... && docker stop ${service_name} && docker rm ${service_name} || printf "\r"
 
 # create bind volumes
 printf "\n\e[34mCreating directories on host...\e[39m\n"
@@ -118,9 +145,13 @@ done
 
 printf "\n\e[34mcreating volumes...\e[39m\n"
 for vol in "${!paths[@]}"; do
-  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data/${paths["$vol"]}" "$vol" || { printf "error while creating docker volumes"; exit 1; }
+  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data/${paths["$vol"]}" "$vol" || {
+    printf "error while creating docker volumes"
+    exit 1
+  }
 done
 
+printf "\n"
 # build container
 docker run -d \
   --name $build_image_name \
@@ -148,7 +179,10 @@ docker run -d \
   -v data-http-logs:"/opt/FileMaker/FileMaker Server/HTTPServer/logs" \
   -v data-Logs:"/opt/FileMaker/FileMaker Server/Logs" \
   -v data-webpub-conf:"/opt/FileMaker/FileMaker Server/Web Publishing/conf" \
-  "$base_image" || { printf "error while running build container"; exit 1; }
+  "$base_image" || {
+  printf "error while running build container"
+  exit 1
+}
 
 # run install script in build container
 docker exec -ti $build_image_name /root/build/helper
@@ -191,6 +225,10 @@ docker stop $build_image_name && docker rm $build_image_name
 
 # TODO
 # remove build directory (maybe keep configs, only remove scripts)
+#if [ $remove_build_dir -eq 1 ]; then
+#    rm install.sh helper
+#fi
+
 
 if [[ $start_server -eq 1 ]]; then
   printf "\nDone. Now starting your server ....\n"

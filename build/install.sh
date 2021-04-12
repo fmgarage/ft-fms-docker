@@ -185,7 +185,7 @@ docker run -d \
 }
 
 # run install script in build container
-docker exec -ti $build_image_name /root/build/helper
+docker exec -ti $build_image_name /root/build/helper.sh
 if [ ! $? ]; then
   printf "error while installing!"
   docker stop $build_image_name

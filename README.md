@@ -64,9 +64,17 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 
 
 
-In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10
+In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
 
 Download and install a Linux distribution of your preference and run it. 
+
+Run the installer – assuming, you copied the folder to Documents and renamed it to "fms":
+
+```
+/mnt/c/Users/your_windows_username/Documents/fms/build/install.sh
+```
+
+
 
 
 
@@ -80,8 +88,10 @@ Download and install a Linux distribution of your preference and run it.
 
 At the moment, quitting Docker Desktop will not gracefully close your databases or stop the server. To prevent your databases from being corrupted by the hard shutdown, always stop the container or use the *fmsadmin stop server* command beforehand.
 
-## Accessing files
 
-Relevant directories are being mounted into the container as volumes. These volumes are bound to their corresponding folders on the host in the `fms-data`folder. In case the container is removed, it is possible to run a new container with the persisted state from the compose file. It is recommended not to edit these files, while the server is running.
+
+### Accessing files
+
+Relevant directories are being mounted into the container as volumes. These volumes are bound to their corresponding folders on the host in the `fms-data` folder. In case the container is removed, it is possible to run a new container with the persisted state from the compose file. It is recommended not to edit these files, while the server is running.
 
 The directories include databases, logs, configs and extensions.

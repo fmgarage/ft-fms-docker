@@ -8,17 +8,17 @@ parent_dir=$(dirname "${pwd}")
 inside_base_path="/opt/FileMaker/FileMaker Server/"
 
 # volume-paths array
-paths=( \
-  "data-admin-conf" "/Admin/conf/" \
-  "data-data-backups" "/Data/Backups/" \
-  "data-data-databases" "/Data/Databases/" \
-  "data-data-preferences" "/Data/Preferences/" \
+paths=(
+  "data-admin-conf" "/Admin/conf/"
+  "data-data-backups" "/Data/Backups/"
+  "data-data-databases" "/Data/Databases/"
+  "data-data-preferences" "/Data/Preferences/"
   "data-dbserver-extensions" "/Database Server/Extensions/"
-  "data-conf" "/conf/" \
+  "data-conf" "/conf/"
   "data-http-dotconf" "/HTTPServer/.conf/"
-  "data-http-conf" "/HTTPServer/conf/" \
+  "data-http-conf" "/HTTPServer/conf/"
   "data-http-logs" "/HTTPServer/logs/"
-  "data-logs" "/Logs/" \
+  "data-logs" "/Logs/"
   "data-webpub-conf" "/Web Publishing/conf/"
 )
 
@@ -96,7 +96,7 @@ if [[ ! $package ]]; then
   printf "\ndownloading fms package ...\n"
   url=$(get_setting "url" ./config.txt)
   STATUS=$(curl -s --head --output /dev/null -w '%{http_code}' "$url")
-  if [ ! $STATUS -eq 200 ]; then
+  if [ ! "$STATUS" -eq 200 ]; then
     echo "Got a $STATUS from URL: $url ..."
     exit
   fi
@@ -117,22 +117,25 @@ while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
   read remove_service
 
   case $remove_service in
-    Y|y)
-      is_valid=1
-      rm_service=1
-      ;;
-    N|n)
-      is_valid=1
-      rm_service=0
-      ;;
-    *)
-      echo Please enter [y]es or [n]o
+  Y | y)
+    is_valid=1
+    rm_service=1
+    ;;
+  N | n)
+    is_valid=1
+    rm_service=0
+    ;;
+  *)
+    echo Please enter [y]es or [n]o
+    ;;
   esac
 done
 
 if [ $old_container -eq 1 ] && [ $rm_service -eq 1 ]; then
-  printf "\nremoving...\n"
-  docker stop ${service_name} && docker rm ${service_name} || printf "\r"
+  printf "\nstopping...\n" &&
+  docker stop ${service_name} &&
+  printf "\nremoving...\n" &&
+  docker rm ${service_name} || printf "\r"
 elif [ $old_container -eq 1 ] && [ $rm_service -eq 0 ]; then
   printf "\n Exiting.\n"
   exit 0
@@ -142,15 +145,15 @@ docker ps -aq --filter "name=${build_image_name}" | grep -q . && echo another bu
 
 # create bind volumes
 printf "\n\e[34mCreating directories on host...\e[39m\n"
-for (( i=1; i<"${#paths[@]}"; i+=2 )); do
+for ((i = 1; i < "${#paths[@]}"; i += 2)); do
   if [[ ! -d "$parent_dir/fms-data${paths[$i]}" ]]; then
     mkdir -p -- "$parent_dir/fms-data${paths[$i]}"
   fi
 done
 
 printf "\n\e[34mcreating volumes...\e[39m\n"
-for (( i=0; i<"${#paths[@]}"; i+=2 )); do
-  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data/${paths[$i+1]}" "${paths[$i]}" || {
+for ((i = 0; i < "${#paths[@]}"; i += 2)); do
+  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data/${paths[$i + 1]}" "${paths[$i]}" || {
     printf "error while creating docker volumes"
     exit 1
   }

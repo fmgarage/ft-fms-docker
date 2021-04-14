@@ -46,6 +46,7 @@ services:
     # init: true
     # privileged: true
     stop_signal: SIGRTMIN+3
+    stop_grace_period: 20m
     restart: "no"
     stdin_open: true
     tty: true
@@ -97,6 +98,7 @@ services:
     # init: true
     # privileged: true
     stop_signal: SIGRTMIN+3
+    stop_grace_period: 20m
     restart: "no"
     stdin_open: true
     tty: true

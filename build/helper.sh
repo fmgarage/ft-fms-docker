@@ -61,6 +61,9 @@ printf "\n  --  \e[34mdefault fmsadmin settings... \e[39m\n"
 fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" set serverconfig SecureFilesOnly=false || { printf "error while fmsadmin securefilesonly"; exit 1; }
 fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" -y disable schedule 1 || { printf "error while fmsadmin disable schedule"; exit 1; }
 
+# change systemd unit stop timeout
+sed -i 's/TimeoutStopSec=2m/TimeoutStopSec=20m/g' /etc/systemd/system/fmshelper.service || { printf "error while changing systemd unit"; exit 1; }
+
 # remove install packages
 printf "\nremove install packages\n"
 rm -r /root/deps/

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 ##!/bin/bash
 
+# todo check if root
+
 # go to working dir
 pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
@@ -153,7 +155,7 @@ done
 
 printf "\n\e[34mcreating volumes...\e[39m\n"
 for ((i = 0; i < "${#paths[@]}"; i += 2)); do
-  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data/${paths[$i + 1]}" "${paths[$i]}" || {
+  docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data${paths[$i + 1]}" "${paths[$i]}" || {
     printf "error while creating docker volumes"
     exit 1
   }

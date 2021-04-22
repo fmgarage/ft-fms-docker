@@ -68,7 +68,7 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 
 In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
 
-The Linux distro used for running the installer and then the container needs systemd, which is not yet officially supported. Still, it's possible  (as of now, for Ubuntu) with the following script:
+The Linux distro used for running the installer and then the container needs systemd, which is not yet officially supported in WSL2. Still, it's possible  (as of now, for Ubuntu) with the following script:
 (https://github.com/damionGans/ubuntu-wsl2-systemd-script)
 
 Download and install a Linux distribution of your preference and run it. (Ubuntu 20.04 recommended)

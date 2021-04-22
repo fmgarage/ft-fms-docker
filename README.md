@@ -1,7 +1,7 @@
 # fmg-dockerfms
 Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image.
 
-**Windows**: there are currently some issued (see below). 
+**Windows**: there are currently some issues (see below). 
 
 We are constantly improving the scripts and try to get rid of the remaining issues. If you want to stay up-to-date, make sure to watch the repo and maybe follow us on twitter: [@fmgarage](https://twitter.com/fmgarage)
 

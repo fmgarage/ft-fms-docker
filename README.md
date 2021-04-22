@@ -1,7 +1,11 @@
 # fmg-dockerfms
 Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image.
 
-**Windows**: the `install.sh` is currently having issues with systemd and Windows paths. 
+**Windows**: there are currently some issued (see below). 
+
+We are constantly improving the scripts and try to get rid of the remaining issues. If you want to stay up-to-date, make sure to watch the repo and maybe follow us on twitter: [@fmgarage](https://twitter.com/fmgarage)
+
+
 
 
 ## Installation on macOS
@@ -75,6 +79,14 @@ Run the installer – assuming, you copied the folder to Documents and renamed i
 ```
 
 
+
+#### Issues: 
+
+As of now it is not possible to run both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 on launch and it is not possible to make a connection to the local server. 
+
+Folders (for databases, backups…) are created on container start but not reconnected if you stop and start the container again. So be careful, as existing files will be overwritten.
+
+Some logfiles are not created because of missing permissions.
 
 
 

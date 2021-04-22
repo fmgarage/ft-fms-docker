@@ -6,8 +6,6 @@ Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything 
 We are constantly improving the scripts and try to get rid of the remaining issues. If you want to stay up-to-date, make sure to watch the repo and maybe follow us on twitter: [@fmgarage](https://twitter.com/fmgarage)
 
 
-
-
 ## Installation on macOS
 
 

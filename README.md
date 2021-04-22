@@ -68,7 +68,10 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 
 In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
 
-Download and install a Linux distribution of your preference and run it. 
+The Linux distro used for running the installer and then the container needs systemd, which is not yet officially supported. Still, it's possible  (as of now, for Ubuntu) with the following script:
+(https://github.com/damionGans/ubuntu-wsl2-systemd-script)
+
+Download and install a Linux distribution of your preference and run it. (Ubuntu 20.04 recommended)
 
 Run the installer – assuming, you copied the folder to Documents and renamed it to "fms":
 
@@ -76,13 +79,21 @@ Run the installer – assuming, you copied the folder to Documents and renamed i
 /mnt/c/Users/your_windows_username/Documents/fms/build/install.sh
 ```
 
+Yet, it's recommended to mount volumes from the WSL filesystem. It's easy to copy the installer into the Linux filesystem like so
+```
+sudo cp -r /mnt/c/Users/your_windows_username/Documents/fms ~
+```
 
+The Linux filesystem can be mounted as network volume into the Windows Explorer by using a path like:
+```
+\\wsl$\your_linux_distro\
+```
 
 #### Issues: 
 
 As of now it is not possible to run both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 on launch and it is not possible to make a connection to the local server. 
 
-Folders (for databases, backups…) are created on container start but not reconnected if you stop and start the container again. So be careful, as existing files will be overwritten.
+Folders (for databases, backups…) are created on container start but not reconnected if you quit/reboot and start Docker Desktop again. Existing files will not be overwritten, but new volumes must be created and attached to the local folders.
 
 Some logfiles are not created because of missing permissions.
 

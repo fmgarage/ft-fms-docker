@@ -179,17 +179,17 @@ docker run -d \
   --tmpfs /run/lock \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v "${pwd}":/root/build/ \
-  -v data-admin-conf:"/opt/FileMaker/FileMaker Server/Admin/conf" \
-  -v data-conf:"/opt/FileMaker/FileMaker Server/conf" \
-  -v data-data-backups:"/opt/FileMaker/FileMaker Server/Data/Backups" \
-  -v data-data-databases:"/opt/FileMaker/FileMaker Server/Data/Databases" \
-  -v data-data-preferences:"/opt/FileMaker/FileMaker Server/Data/Preferences" \
-  -v data-dbserver-extensions:"/opt/FileMaker/FileMaker Server/Database Server/Extensions/" \
-  -v data-http-dotconf:"/opt/FileMaker/FileMaker Server/HTTPServer/.conf" \
-  -v data-http-conf:"/opt/FileMaker/FileMaker Server/HTTPServer/conf" \
-  -v data-http-logs:"/opt/FileMaker/FileMaker Server/HTTPServer/logs" \
-  -v data-Logs:"/opt/FileMaker/FileMaker Server/Logs" \
-  -v data-webpub-conf:"/opt/FileMaker/FileMaker Server/Web Publishing/conf" \
+  -v data-admin-conf:"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
+  -v data-conf:"/opt/FileMaker/FileMaker Server/conf":delegated \
+  -v data-data-backups:"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
+  -v data-data-databases:"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
+  -v data-data-preferences:"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
+  -v data-dbserver-extensions:"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
+  -v data-http-dotconf:"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
+  -v data-http-conf:"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
+  -v data-http-logs:"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
+  -v data-logs:"/opt/FileMaker/FileMaker Server/Logs":delegated \
+  -v data-webpub-conf:"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
   "$base_image" || {
   printf "error while running build container"
   exit 1
@@ -207,11 +207,11 @@ fi
 # check for flag file
 build_success=$(find . -name build_success)
 if [[ ! $build_success ]]; then
-  echo "build not successful"
+  printf "build not successful\n"
+  printf "stopping & removing build container ...\n"
   docker stop $build_image_name
   docker rm $build_image_name
   exit 1
-  docker volume rm data-admin-extensions
 fi
 
 # remove flag file

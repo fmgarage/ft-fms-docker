@@ -69,7 +69,7 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
 
 The Linux distro used for running the installer and then the container needs systemd, which is not yet officially supported in WSL2. Still, it's possible  (as of now, for Ubuntu) with the following script:
-(https://github.com/damionGans/ubuntu-wsl2-systemd-script)
+https://github.com/damionGans/ubuntu-wsl2-systemd-script
 
 Download and install a Linux distribution of your preference and run it. (Ubuntu 20.04 recommended)
 
@@ -94,22 +94,41 @@ The Linux filesystem can be mounted as network volume into the Windows Explorer 
 As of now it is not possible to run both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 on launch and it is not possible to make a connection to the local server. 
 
 Folders (for databases, backups…) are created on container start but not reconnected if you quit/reboot and start Docker Desktop again. Existing files will not be overwritten, but new volumes must be created and attached to the local folders.
+This happens in the start_server script, where the wsl directory is checked before starting the container. It is considered a workaround to this issue: [docker/for-win/issues/10060](https://github.com/docker/for-win/issues/10060)
 
-Some logfiles are not created because of missing permissions.
+You will have to confirm the deletion of a success flag file while installing a new fmserver image.
 
-
-
+~~-Some logfiles are not created because of missing permissions.~~
 
 
 ## Administration
-
 
 
 ### Stopping and Restarting the Server
 
 At the moment, quitting Docker Desktop will not gracefully close your databases or stop the server. To prevent your databases from being corrupted by the hard shutdown, always stop the container or use the *fmsadmin stop server* command beforehand.
 
+To handle some issues and restrictions, there are scripts for controlling your server instances in the `tools/` subdirectory:
 
+**setup_project**
+
+ID, volumes, fms-data check?
+
+**remove_project**
+
+volumes, container, not fms-data
+
+**start_server**
+
+Start this server instance 
+
+**stop_server**
+
+stop service inside container, dbs closed, win not guaranteed
+
+**global_cleanup**
+
+remove dangling volumes, remove fms-net when no container left
 
 ### Accessing files
 

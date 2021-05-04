@@ -11,17 +11,17 @@ inside_base_path="/opt/FileMaker/FileMaker Server/"
 
 # volume-paths array
 paths=(
-  "data-admin-conf" "/Admin/conf/"
-  "data-data-backups" "/Data/Backups/"
-  "data-data-databases" "/Data/Databases/"
-  "data-data-preferences" "/Data/Preferences/"
-  "data-dbserver-extensions" "/Database Server/Extensions/"
-  "data-conf" "/conf/"
-  "data-http-dotconf" "/HTTPServer/.conf/"
-  "data-http-conf" "/HTTPServer/conf/"
-  "data-http-logs" "/HTTPServer/logs/"
-  "data-logs" "/Logs/"
-  "data-webpub-conf" "/Web Publishing/conf/"
+  "fms-admin-conf" "/Admin/conf/"
+  "fms-data-backups" "/Data/Backups/"
+  "fms-data-databases" "/Data/Databases/"
+  "fms-data-preferences" "/Data/Preferences/"
+  "fms-dbserver-extensions" "/Database Server/Extensions/"
+  "fms-conf" "/conf/"
+  "fms-http-dotconf" "/HTTPServer/.conf/"
+  "fms-http-conf" "/HTTPServer/conf/"
+  "fms-http-logs" "/HTTPServer/logs/"
+  "fms-logs" "/Logs/"
+  "fms-webpub-conf" "/Web Publishing/conf/"
 )
 
 # parse config
@@ -77,13 +77,67 @@ remove_build_dir=$(get_setting "remove_build_dir" ./config.txt)
 admin_user=$(get_setting "Admin Console User" ./"$assisted_install")
 admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 
-if [[ ! $c_cert ]] || [[ ! $c_bundle ]] || [[ ! $c_key ]]; then
-  image_name=centos-fms-19_2
-  service_name=fms
-else
-  image_name=centos-fms-c-19_2
-  service_name=fms-c
-fi
+# set project id
+# todo wording, enter name or empty for id
+#while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
+  printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
+  read -r user_input
+
+  case $user_input in
+#  Y | y)
+#    printf "Enter project name:\n"
+#    read -r project_id
+#    # todo while valid (check if exists)
+#    ;;
+  "")
+    # todo while valid (check if exists)
+    project_id=$(uuidgen | md5 | cut -c-12)  # | cut -c-12
+    echo "id: " "$project_id"
+    ;;
+  (*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
+    echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
+    exit 1
+    ;;
+  *)
+    project_id=$user_input
+#    printf "Enter project name:\n"
+#    read -r project_id
+    # todo while valid (check if exists)
+    ;;
+  esac
+#done
+
+# write to .env
+echo "ID=${project_id}" > ../.env
+
+# volume-paths array
+paths=(
+  "fms-admin-conf-${project_id}" "/Admin/conf/"
+  "fms-data-backups-${project_id}" "/Data/Backups/"
+  "fms-data-databases-${project_id}" "/Data/Databases/"
+  "fms-data-preferences-${project_id}" "/Data/Preferences/"
+  "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
+  "fms-conf-${project_id}" "/conf/"
+  "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
+  "fms-http-conf-${project_id}" "/HTTPServer/conf/"
+  "fms-http-logs-${project_id}" "/HTTPServer/logs/"
+  "fms-logs-${project_id}" "/Logs/"
+  "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
+)
+
+#if [[ ! $c_cert ]] || [[ ! $c_bundle ]] || [[ ! $c_key ]]; then
+#  image_name=centos-fms-19_2
+#  service_name=fms
+#  container_name=fms-${project_id}
+#else
+#  image_name=centos-fms-c-19_2
+#  service_name=fms-c
+#  container_name=fms-c-${project_id}
+#fi
+
+image_name=centos-fms-19_2
+service_name=fms
+container_name=fms-${project_id}
 
 build_image_name=fmsinstall
 # todo pin version tag / digest
@@ -112,10 +166,11 @@ fi
 # check if container names are in use
 old_container=0
 rm_service=0
-docker ps -aq --filter "name=${service_name}" | grep -q . && old_container=1
+docker ps -aq --filter "name=${container_name}" | grep -q . && old_container=1
 is_valid=0
 while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
-  echo Another ${service_name} container already exists, remove and build a new image? [y/n]
+  # todo reuse service
+  echo Another "${container_name}" container already exists, remove and build a new image? [y/n]
   read remove_service
 
   case $remove_service in
@@ -135,9 +190,9 @@ done
 
 if [ $old_container -eq 1 ] && [ $rm_service -eq 1 ]; then
   printf "\nstopping...\n" &&
-  docker stop ${service_name} &&
+  docker stop "${container_name}" &&
   printf "\nremoving...\n" &&
-  docker rm ${service_name} || printf "\r"
+  docker rm "${container_name}" || printf "\r"
 elif [ $old_container -eq 1 ] && [ $rm_service -eq 0 ]; then
   printf "\n Exiting.\n"
   exit 0
@@ -179,23 +234,24 @@ docker run -d \
   --tmpfs /run/lock \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v "${pwd}":/root/build/ \
-  -v data-admin-conf:"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
-  -v data-conf:"/opt/FileMaker/FileMaker Server/conf":delegated \
-  -v data-data-backups:"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
-  -v data-data-databases:"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
-  -v data-data-preferences:"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
-  -v data-dbserver-extensions:"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
-  -v data-http-dotconf:"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
-  -v data-http-conf:"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
-  -v data-http-logs:"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
-  -v data-logs:"/opt/FileMaker/FileMaker Server/Logs":delegated \
-  -v data-webpub-conf:"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
+  -v fms-admin-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
+  -v fms-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/conf":delegated \
+  -v fms-data-backups-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
+  -v fms-data-databases-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
+  -v fms-data-preferences-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
+  -v fms-dbserver-extensions-"${project_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
+  -v fms-http-dotconf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
+  -v fms-http-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
+  -v fms-http-logs-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
+  -v fms-logs-"${project_id}":"/opt/FileMaker/FileMaker Server/Logs":delegated \
+  -v fms-webpub-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
   "$base_image" || {
   printf "error while running build container"
   exit 1
 }
 
 # run install script inside build container
+# todo omit -ti?
 docker exec -ti $build_image_name /root/build/helper.sh
 if [ ! $? ]; then
   printf "error while installing!"
@@ -234,9 +290,33 @@ docker tag $image_name:"${date}" "${image_name}":latest
 printf "\nremoving build container ...\n"
 docker stop $build_image_name && docker rm $build_image_name
 
+# todo
+# backup/zip fms-data directory
+
+
+# check if fms network exists
+network=0
+docker network ls -q --filter "name=^fms-net$" | grep -q . && network=1
+case $network in
+0)
+  echo "Network fms-net not found, will be created"
+  compose_files="-f ../docker-compose.yml -f ../fms-network.yml"
+  ;;
+1)
+  compose_files="-f ../docker-compose.yml"
+  ;;
+*)
+  printf "error while looking for fms docker network: %s" "$(docker network ls -q --filter "name=fms-net")"
+  exit 1
+  ;;
+esac
+
 if [[ $start_server -eq 1 ]]; then
   printf "\nDone. Now starting your server ....\n"
-  docker-compose up -d $service_name
+  docker-compose $compose_files up -d $service_name
 else
-  printf "\nDone. You can now start your server with\e[34m docker-compose up [-d] %s\e[39m\n" "$service_name"
+  compose_files=$(sed 's/..\///g' <<< "$compose_files")
+  printf "\nDone. You can now start your server with\e[34m ./tools/start_server\e[39m or \e[34mdocker-compose %s up [-d] %s\e[39m\n" "$compose_files" "$service_name"
 fi
+
+exit 0

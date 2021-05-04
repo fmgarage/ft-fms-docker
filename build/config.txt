@@ -1,0 +1,13 @@
+# download URL for the fms install package. Only needed when local file is not found.
+url=
+
+# Certificate files. Only needed, if no crt, pem, ca-bundle in build directory. Leave empty to not install a certificate.
+certificate=
+ca-bundle=
+key-file=
+
+# name of file with assisted install instructions
+assisted_install=Assisted Install.txt
+
+# start server after install?
+start_server=1

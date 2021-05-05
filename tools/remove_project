@@ -58,7 +58,7 @@ if [ $old_container -eq 1 ] && [ $rm_container -eq 1 ]; then
   docker rm ${container_name} || printf "\r"
 elif [ $old_container -eq 1 ] && [ $rm_container -eq 0 ]; then
   printf "\nExiting.\n"
-  exit 0
+  exit 2
 else
   printf "no container found\n"
 fi

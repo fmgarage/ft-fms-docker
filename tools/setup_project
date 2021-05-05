@@ -22,11 +22,39 @@ function check_setting() {
 project_id=$(get_setting "ID" ../.env)
 check_setting "$project_id"
 
+# volume-paths array
+paths=(
+  "fms-admin-conf-${project_id}" "/Admin/conf/"
+  "fms-data-backups-${project_id}" "/Data/Backups/"
+  "fms-data-databases-${project_id}" "/Data/Databases/"
+  "fms-data-preferences-${project_id}" "/Data/Preferences/"
+  "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
+  "fms-conf-${project_id}" "/conf/"
+  "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
+  "fms-http-conf-${project_id}" "/HTTPServer/conf/"
+  "fms-http-logs-${project_id}" "/HTTPServer/logs/"
+  "fms-logs-${project_id}" "/Logs/"
+  "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
+)
+
+# check directories
+printf "\n\e[34mChecking directories on host...\e[39m\n"
+no_dirs=0
+for ((i = 1; i < "${#paths[@]}"; i += 2)); do
+  if [[ ! -d "$parent_dir/fms-data${paths[$i]}" ]]; then
+    no_dirs=1
+    printf "\e[31mError:\e[39m missing directory %s/fms-data%s\n" "$parent_dir" "${paths[$i]}"
+  fi
+done
+
+[ $no_dirs -eq 1 ] && exit 1
+
 # todo reuse or remove old stuff
 [ -n "$project_id" ] && {
   printf "Found project name: %s\n" "${project_id}"
   old_volumes=$(docker volume ls -q --filter="name=${project_id}$")
-  [ -n "$old_volumes" ] && ./remove_project
+  [ -n "$old_volumes" ] && ./remove_project || exit 1 # todo get exit code
+#  [ $? -ne 0 ]  || exit 1
 }
 
 # set project id
@@ -57,31 +85,6 @@ esac
 
 # write to .env
 echo "ID=${project_id}" >../.env
-
-# volumes
-# todo extrenal script
-# volume-paths array
-paths=(
-  "fms-admin-conf-${project_id}" "/Admin/conf/"
-  "fms-data-backups-${project_id}" "/Data/Backups/"
-  "fms-data-databases-${project_id}" "/Data/Databases/"
-  "fms-data-preferences-${project_id}" "/Data/Preferences/"
-  "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
-  "fms-conf-${project_id}" "/conf/"
-  "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
-  "fms-http-conf-${project_id}" "/HTTPServer/conf/"
-  "fms-http-logs-${project_id}" "/HTTPServer/logs/"
-  "fms-logs-${project_id}" "/Logs/"
-  "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
-)
-
-## create directories
-#printf "\n\e[34mCreating directories on host...\e[39m\n"
-#for ((i = 1; i < "${#paths[@]}"; i += 2)); do
-#  if [[ ! -d "fms-data${paths[$i]}" ]]; then
-#    mkdir -p -- "fms-data${paths[$i]}"
-#  fi
-#done
 
 # create bind volumes
 printf "\n\e[34mcreating volumes...\e[39m\n"

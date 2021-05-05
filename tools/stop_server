@@ -26,7 +26,7 @@ check_setting "$project_id"
 # stop that nasty service
 printf "\nNow stopping httpd service ....\n"
 docker exec fms-${project_id} touch "/opt/FileMaker/FileMaker Server/HTTPServer/stop" || {
-  printf "error while stopping fms container\n"
+  printf "error while stopping httpd service\n"
   exit 1
 }
 

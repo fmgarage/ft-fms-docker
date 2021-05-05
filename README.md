@@ -101,22 +101,6 @@ Some logfiles are not created because of missing permissions.
 
 
 
-## Tools
-
-In the tools folder there are little scripts to help you managing your server
-
-### reset_project
-
-A new instance that was created by duplicating a project folder must be renamed to a unique value and matching docker volumes 
-
-### start_server
-
-### stop_server
-
-
-
-
-
 ## Administration
 
 
@@ -132,25 +116,3 @@ At the moment, quitting Docker Desktop will not gracefully close your databases 
 Relevant directories are being mounted into the container as volumes. These volumes are bound to their corresponding folders on the host in the `fms-data` folder. In case the container is removed, it is possible to run a new container with the persisted state from the compose file. It is recommended not to edit these files, while the server is running.
 
 The directories include databases, logs, configs and extensions.
-
-
-
-### Managing Instances 
-
-(macOS only) 
-
-If you need more than one instance, you can simply duplicate an installation
-
-
-
-### Snapshots
-
-(macOS only)
-
-As all settings and database files are stored in the fma-data folder, you can
-
-
-
-## More Technical Stuff
-
-[…]

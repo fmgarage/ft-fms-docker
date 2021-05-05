@@ -49,9 +49,9 @@ If you have a certificate that you might want to use for this server, simply cop
 
 Open Terminal.app, drag the **install.sh** into the terminal window, hit return and give your server instance a name. Or just let it be tagged with an ID.
 
-After the installation process is finished, check the Dashboard in Docker Desktop, there should be a running container named **fms-<name-tag>**.
+After the installation process is finished, check the Dashboard in Docker Desktop, there should be a running container named **fms-[name-tag]**.
 
-Open the admin console by clicking the *Open in Browser* button in the container actions. In case you installed without certificate you will have to confirm the self-signed one.
+Open the admin console by clicking the *Open in Browser* button in the container actions (Chrome doesn't work, Safari does). In case you installed without certificate you will have to confirm the self-signed one.
 
 Clicking the CLI button will open a terminal window where you can use the fmsadmin command to control your server.
 
@@ -92,9 +92,8 @@ This happens in the `start_server script, where the wsl directory is checked bef
 
 You will have to confirm the deletion of a success flag file while installing a new fmserver image.
 
-Sometimes when stopping the server container with `tools/stop_server`, the fmshelper process doesn't exit. We're still figuring out why. The StopTimeout for the container is 10 minutes, after that it will be stopped forcefully.
-
-~~-Some logfiles are not created because of missing permissions.~~
+Sometimes when stopping the server container with `tools/stop_server`, the fmshelper process doesn't exit. We're still figuring out why.
+The StopTimeout for the container is 10 minutes, after that it will be stopped forcefully. You can take a shortcut with `docker stop fms-[name-tag] -t 5` (stop with timeout 5 seconds).
 
 
 ## Administration
@@ -125,10 +124,10 @@ Stops server, you will be prompted to close any open databases.
 
 **global_cleanup**
 
-This removes any dangling volumes (attached to no container) and removes the docker network `fms-net`, when no container named `fms-*` is left.
+This removes any dangling volumes (attached to no container) and also removes the docker network `fms-net`, when no container named `fms-*` is left.
 
 ### Accessing files
 
-Relevant directories are being mounted into the container as volumes. These volumes are bound to their corresponding folders on the host in the `fms-data` folder. In case the container is removed, it is possible to run a new container with the persisted state from the compose file. It is recommended not to edit these files, while the server is running.
+Relevant directories are being mounted into the container as volumes. These volumes are bound to their corresponding folders on the host in the `fms-data` folder. In case the container is removed, it is possible to run a new container with the persisted state with the `tools/start_server` script. It is recommended not to edit these files while the server is running.
 
 The directories include databases, logs, configs and extensions.

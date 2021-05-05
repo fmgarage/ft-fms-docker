@@ -51,6 +51,7 @@ If you have a certificate that you might want to use for this server, simply cop
 ### Build Image and run Container
 
 FileMaker Server requires port 5003 to start, so make sure to quit any FileMaker Pro client before proceeding.
+
 Open Terminal.app, drag the **install.sh** into the terminal window, hit return and give your server instance a name. Or just let it be tagged with an ID.
 
 After the installation process is finished, check the Dashboard in Docker Desktop, there should be a running container named **fms-[name-tag]**.

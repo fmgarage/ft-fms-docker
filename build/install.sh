@@ -91,7 +91,7 @@ admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 #    ;;
   "")
     # todo while valid (check if exists)
-    project_id=$(uuidgen | md5 | cut -c-12)  # | cut -c-12
+    project_id=$(uuidgen | md5sum | cut -c-12)  # | cut -c-12
     echo "id: " "$project_id"
     ;;
   (*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)

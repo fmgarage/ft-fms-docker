@@ -70,6 +70,11 @@ if [[ $c_cert ]] && [[ $c_bundle ]] && [[ $c_key ]]; then
   }
 fi
 
+# debug
+printf "\nwhoami: %s\n " "$(whoami)"
+ls -lah "/opt/FileMaker/FileMaker Server/Database Server/bin/"
+printf "\n"
+
 # default fms config
 printf "\n  --  \e[36mdefault fmsadmin settings... \e[39m\n"
 fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" set serverconfig SecureFilesOnly=false || {

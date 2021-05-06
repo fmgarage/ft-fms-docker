@@ -122,7 +122,8 @@ fi
 #  done
 #done
 
-echo "" >${build_dir_mount}build_success
+touch ${build_dir_mount}build_success && chown 1000:1000 ${build_dir_mount}build_success
+
 
 printf "\n  --  \e[36mFinished install inside fmsinstall container, returning...\e[39m\n"
 

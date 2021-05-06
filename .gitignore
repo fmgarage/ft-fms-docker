@@ -2,6 +2,7 @@
 *.crt
 *.key
 *.pem
+*.p7b
 *.rpm
 .idea
 _try

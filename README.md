@@ -88,6 +88,9 @@ Run the installer – assuming you copied the folder to Documents and renamed it
 
 ggf. erneut installieren bei Fehler
 
+- fmsadmin permissions
+- Docker Dashboard open in browser kein https
+
 Yet, it is recommended to mount volumes from the WSL filesystem. It is easy to copy the installer into the Linux filesystem like so:
 
 ```
@@ -105,7 +108,7 @@ But, due to permissions, this isn't of much use apart from reading files.
 #### Issues: 
 
 Folders (for databases, backups…) are created on container start but not reconnected if you reboot and start Docker Desktop again. Existing files will not be overwritten, but new volumes must be created and attached to the local folders.
-This happens in the `start_server script, where the wsl directory is checked before starting the container. It is considered a workaround to this issue: [docker/for-win/issues/10060](https://github.com/docker/for-win/issues/10060)
+This happens in the `start_server` script, where the wsl directory is checked before starting the container. It is considered a workaround to this issue: [docker/for-win/issues/10060](https://github.com/docker/for-win/issues/10060)
 
 You will have to confirm the deletion of a success flag file while installing a new fmserver image.
 

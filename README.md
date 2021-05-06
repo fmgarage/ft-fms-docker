@@ -68,13 +68,13 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 
 In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
 
-Download and install Ubuntu 20.04
+@todo Download and install Ubuntu 20.04, update/upgrade
 
-update/upgrade
+@todo Install systemd: https://github.com/damionGans/ubuntu-wsl2-systemd-script
 
-Install systemd: https://github.com/damionGans/ubuntu-wsl2-systemd-script
+@todo restart WSL
 
-restart WSL
+@todo Windows Firewall?
 
 Docker-Setting: WSL/Ubuntu aktivieren
 

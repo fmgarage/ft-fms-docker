@@ -66,38 +66,50 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 
 **Important**: As of now it is not possible to run both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 on launch and it is not possible to make a connection to the local server. 
 
-In addition to the macOS instructions you will have to install the Windows Subsystem for Linux WSL first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
+In addition to the macOS instructions you will have to install the Windows Subsystem for Linux **WSL** first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
 
-@todo Download and install Ubuntu 20.04, update/upgrade
-
-@todo Install systemd: https://github.com/damionGans/ubuntu-wsl2-systemd-script
-
-@todo restart WSL
-
-@todo Windows Firewall?
-
-Docker-Setting: WSL/Ubuntu aktivieren
-
-Copy the source folder into the your home directory using the console
-
-Run the installer – assuming you copied the folder to Documents and renamed it to "fms":
-
-```
-/mnt/c/Users/your_windows_username/Documents/fms/build/install.sh
+Download and install Ubuntu from the Windows Store (Ubuntu and Ubuntu 20.04 apps are identical), just make sure it is the one offered by Canonical Group Limited.
+When installed, update packages:
+```shell
+sudo apt update
+sudo apt upgrade
 ```
 
-ggf. erneut installieren bei Fehler
+Most likely, it will be necessary to restart Ubuntu after the update, which in this case is done by leaving the linux environment with
+```shell
+exit
+```
+and then starting Ubuntu again.
 
-- fmsadmin permissions
-- Docker Dashboard open in browser kein https
+Now, to provide the necessary systemd service to the Ubuntu host, run this script:
+https://github.com/damionGans/ubuntu-wsl2-systemd-script
 
-Yet, it is recommended to mount volumes from the WSL filesystem. It is easy to copy the installer into the Linux filesystem like so:
+Again, restart Ubuntu by exiting and starting again.
+
+
+In the Docker Desktop settings: Under **General**, activate WSL2 based engine and under **Resources > WSL Integration** activate WSL2 support for your Ubuntu installation.
+It may be necessary to restart both Docker Desktop and Ubuntu to get the integration into a working state. You can test and see if `docker ps` from the Ubuntu terminal throws any error.
+
+Since it is recommended not to mount volumes from the Windows filesystem into a WSL2 Docker container but rather directly from the WSL filesystem , copy the installer into the Linux filesystem, assuming you put the installer into Documents:
 
 ```
-sudo cp -r /mnt/c/Users/your_windows_username/Documents/fms ~
+sudo cp -rv /mnt/c/Users/your_windows_username/Documents/fmg-dockerfms-main ~/fms
 ```
 
-The Linux filesystem can be mounted as network volume into the Windows Explorer by using a path like:
+It may be necessary to grant an allow rule for Docker Desktop in the **Windows firewall** when prompted. 
+
+Run the installer :
+```
+./fms/build/install.sh
+```
+
+[comment]: <> (ggf. erneut installieren bei Fehler)
+
+[comment]: <> (- fmsadmin permissions)
+[comment]: <> (- Docker Dashboard open in browser kein https)
+
+
+The Linux filesystem can also be mounted as network volume into the Windows Explorer by using a path like:
 ```
 \\wsl$\your_linux_distro\
 ```

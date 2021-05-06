@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-printf "\n  --  \e[34mStarting install inside fmsinstall container\e[39m\n"
+printf "\n  --  \e[36mStarting install inside fmsinstall container\e[39m\n"
 # settings
 build_dir_mount=/root/build/
 
@@ -71,7 +71,7 @@ if [[ $c_cert ]] && [[ $c_bundle ]] && [[ $c_key ]]; then
 fi
 
 # default fms config
-printf "\n  --  \e[34mdefault fmsadmin settings... \e[39m\n"
+printf "\n  --  \e[36mdefault fmsadmin settings... \e[39m\n"
 fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" set serverconfig SecureFilesOnly=false || {
   printf "error while fmsadmin securefilesonly\n"
   exit 1
@@ -119,7 +119,7 @@ fi
 
 echo "" >${build_dir_mount}build_success
 
-printf "\n  --  \e[34mFinished install inside fmsinstall container, returning...\e[39m\n"
+printf "\n  --  \e[36mFinished install inside fmsinstall container, returning...\e[39m\n"
 
 # exit
 exit 0

@@ -64,7 +64,7 @@ else
 fi
 
 # remove bind volumes
-printf "\n\e[34mremoving docker volumes...\e[39m\n"
+printf "\n\e[36mremoving docker volumes...\e[39m\n"
 
 docker volume rm $(docker volume ls -q --filter="name=${project_id}$")
 

@@ -201,14 +201,14 @@ fi
 docker ps -aq --filter "name=${build_image_name}" | grep -q . && echo another build container already exists, removing... && docker stop $build_image_name && docker rm $build_image_name || printf "\r"
 
 # create bind volumes
-printf "\n\e[34mCreating directories on host...\e[39m\n"
+printf "\n\e[36mCreating directories on host...\e[39m\n"
 for ((i = 1; i < "${#paths[@]}"; i += 2)); do
   if [[ ! -d "$parent_dir/fms-data${paths[$i]}" ]]; then
     mkdir -p -- "$parent_dir/fms-data${paths[$i]}"
   fi
 done
 
-printf "\n\e[34mcreating docker volumes...\e[39m\n"
+printf "\n\e[36mcreating docker volumes...\e[39m\n"
 for ((i = 0; i < "${#paths[@]}"; i += 2)); do
   docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data${paths[$i + 1]}" "${paths[$i]}" || {
     printf "error while creating docker volumes"
@@ -316,7 +316,7 @@ if [[ $start_server -eq 1 ]]; then
   docker-compose $compose_files up -d $service_name
 else
   compose_files=$(sed 's/..\///g' <<< "$compose_files")
-  printf "\nDone. You can now start your server with\e[34m ./tools/start_server\e[39m or \e[34mdocker-compose %s up [-d] %s\e[39m\n" "$compose_files" "$service_name"
+  printf "\nDone. You can now start your server with\e[36m ./tools/start_server\e[39m or \e[36mdocker-compose %s up [-d] %s\e[39m\n" "$compose_files" "$service_name"
 fi
 
 exit 0

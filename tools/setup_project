@@ -38,7 +38,7 @@ paths=(
 )
 
 # check directories
-printf "\n\e[34mChecking directories on host...\e[39m\n"
+printf "\n\e[36mChecking directories on host...\e[39m\n"
 no_dirs=0
 for ((i = 1; i < "${#paths[@]}"; i += 2)); do
   if [[ ! -d "$parent_dir/fms-data${paths[$i]}" ]]; then
@@ -87,7 +87,7 @@ esac
 echo "ID=${project_id}" >../.env
 
 # create bind volumes
-printf "\n\e[34mcreating volumes...\e[39m\n"
+printf "\n\e[36mcreating volumes...\e[39m\n"
 for ((i = 0; i < "${#paths[@]}"; i += 2)); do
   docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data${paths[$i + 1]}" "${paths[$i]}" || {
     printf "error while creating docker volumes"

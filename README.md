@@ -56,7 +56,7 @@ Open Terminal.app, drag the **install.sh** into the terminal window, hit return 
 
 After the installation process is finished, check the Dashboard in Docker Desktop, there should be a running container named **fms-[name-tag]**.
 
-Open the admin console by clicking the *Open in Browser* button in the container actions (Chrome doesn't work, Safari does). In case you installed without certificate you will have to confirm the self-signed one.
+Open the admin console by clicking the *Open in Browser* (@todo uses http and wont work) button in the container actions (Chrome doesn't work, Safari does). In case you installed without certificate you will have to confirm the self-signed one.
 
 Clicking the CLI button will open a terminal window where you can use the fmsadmin command to control your server.
 
@@ -182,7 +182,7 @@ The directories include databases, logs, configs and extensions.
 
 (macOS only) 
 
-If you need more than one instance, you can simply duplicate an installation
+If you need more than one instance, you can simply duplicate an installation (will also duplicate settings, logs and databases, setup new project name with `tools/setup_project`)
 
 It is possible to have multiple instances of these installations, but you can run only one at a time. Each installation is bound to its directory, where the `fms-data` (FileMaker Server directories) directory and the `.env` (name-tag) file are located. 
 

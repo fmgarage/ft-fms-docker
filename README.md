@@ -56,7 +56,11 @@ Open Terminal.app, drag the **install.sh** into the terminal window, hit return 
 
 After the installation process is finished, check the Dashboard in Docker Desktop, there should be a running container named **fms-[name-tag]**.
 
-Open the admin console by clicking the *Open in Browser* (@todo uses http and wont work) button in the container actions (Chrome doesn't work, Safari does). In case you installed without certificate you will have to confirm the self-signed one.
+Open the admin console by clicking the *Open in Browser* button in the container actions. In case you installed without certificate you will have to confirm the self-signed one.
+
+- Chrome: doesn't work with no valid certificate
+- Safari: possible to bypass the certificate warning
+- Edge: possible to bypass the certificate warning, but opened from Docker Dashboard, the URL comes as an `http` link, and you need to append `https://`.
 
 Clicking the CLI button will open a terminal window where you can use the fmsadmin command to control your server.
 
@@ -88,7 +92,7 @@ Again, restart Ubuntu by exiting and starting again.
 
 
 In the Docker Desktop settings: Under **General**, activate WSL2 based engine and under **Resources > WSL Integration** activate WSL2 support for your Ubuntu installation.
-It may be necessary to restart both Docker Desktop and Ubuntu to get the integration into a working state. You can test and see if `docker ps` from the Ubuntu terminal throws any error.
+It may be necessary to restart both Docker Desktop and Ubuntu (or even reboot Windows) to get the integration into a working state. You can test and see if `docker ps` from the Ubuntu terminal throws any error.
 
 Since it is recommended not to mount volumes from the Windows filesystem into a WSL2 Docker container but rather directly from the WSL filesystem , copy the installer into the Linux filesystem, assuming you put the installer into Documents:
 
@@ -96,7 +100,7 @@ Since it is recommended not to mount volumes from the Windows filesystem into a 
 sudo cp -rv /mnt/c/Users/your_windows_username/Documents/fmg-dockerfms-main ~/fms
 ```
 
-It may be necessary to grant an allow rule for Docker Desktop in the **Windows firewall** when prompted. 
+It may be necessary to grant an access rule for Docker Desktop in the **Windows firewall** when prompted. 
 
 Run the installer :
 ```
@@ -104,9 +108,7 @@ Run the installer :
 ```
 
 [comment]: <> (ggf. erneut installieren bei Fehler)
-
 [comment]: <> (- fmsadmin permissions)
-[comment]: <> (- Docker Dashboard open in browser kein https)
 
 
 The Linux filesystem can also be mounted as network volume into the Windows Explorer by using a path like:
@@ -127,7 +129,7 @@ This happens in the `start_server` script, where the wsl directory is checked be
 Sometimes when stopping the server container with `tools/stop_server`, the fmshelper process doesn't exit. We're still figuring out why.
 The StopTimeout for the container is 10 minutes, after that it will be stopped forcefully. You can take a shortcut with `docker stop fms-[name-tag] -t 5` (stop with timeout 5 seconds).
 
-
+Docker Desktop for Windows fails to restart, rebooting Windows may be the fastest way solve this. 
 
 
 

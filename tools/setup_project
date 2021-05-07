@@ -53,16 +53,13 @@ done
 [ -n "$project_id" ] && {
   printf "Found project name: %s\n" "${project_id}"
   old_volumes=$(docker volume ls -q --filter="name=${project_id}$")
-  [ -n "$old_volumes" ] && ./remove_project || exit 1 # todo get exit code
-#  [ $? -ne 0 ]  || exit 1
+  [ -n "$old_volumes" ] && ./remove_project || exit 1
 }
 
 # set project id
-# todo wording, enter name or empty for id
 #while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
 printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
 read -r user_input
-
 
 case $user_input in
 "")
@@ -76,15 +73,27 @@ case $user_input in
   ;;
 *)
   project_id=$user_input
-  #    printf "Enter project name:\n"
-  #    read -r project_id
   # todo while valid (check if exists)
   ;;
 esac
-#done
 
 # write to .env
 echo "ID=${project_id}" >../.env
+
+# reset paths
+paths=(
+  "fms-admin-conf-${project_id}" "/Admin/conf/"
+  "fms-data-backups-${project_id}" "/Data/Backups/"
+  "fms-data-databases-${project_id}" "/Data/Databases/"
+  "fms-data-preferences-${project_id}" "/Data/Preferences/"
+  "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
+  "fms-conf-${project_id}" "/conf/"
+  "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
+  "fms-http-conf-${project_id}" "/HTTPServer/conf/"
+  "fms-http-logs-${project_id}" "/HTTPServer/logs/"
+  "fms-logs-${project_id}" "/Logs/"
+  "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
+)
 
 # create bind volumes
 printf "\n\e[36mcreating volumes...\e[39m\n"

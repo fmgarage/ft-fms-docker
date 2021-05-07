@@ -4,7 +4,6 @@ printf "\n  --  \e[36mStarting install inside fmsinstall container\e[39m\n"
 # settings
 build_dir_mount=/root/build/
 
-# cert_prefix=$CERT_PREFIX
 c_cert=$CERT_CERT
 c_bundle=$CERT_BUNDLE
 c_key=$CERT_KEY
@@ -27,7 +26,6 @@ yum install centos-release-scl deltarpm -y || exit 1
 yum update -y
 
 # pre packages, possibly omit sudo, autofs
-# yum install bash-completion firewalld nano policycoreutils net-tools httpd24 httpd24-mod_ssl -y || exit 1
 yum install bash-completion firewalld nano policycoreutils net-tools httpd24 httpd24-mod_ssl -y || {
   printf "error while installing pre-packages\n"
   exit 1
@@ -70,10 +68,10 @@ if [[ $c_cert ]] && [[ $c_bundle ]] && [[ $c_key ]]; then
   }
 fi
 
-# debug
-printf "\nwhoami: %s\n " "$(whoami)"
-ls -lah "/opt/FileMaker/FileMaker Server/Database Server/bin/"
-printf "\n"
+## debug
+#printf "\nwhoami: %s\n " "$(whoami)"
+#ls -lah "/opt/FileMaker/FileMaker Server/Database Server/bin/"
+#printf "\n"
 
 # default fms config
 printf "\n  --  \e[36mdefault fmsadmin settings... \e[39m\n"
@@ -87,7 +85,6 @@ fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" -y disable schedule 1 || {
 }
 
 # change systemd unit stop timeout
-#touch /etc/systemd/system/fmshelper.service.d/override.conf
 mkdir -p /etc/systemd/system/fmshelper.service.d/
 cat >/etc/systemd/system/fmshelper.service.d/override.conf <<EOF
 [Service]
@@ -97,7 +94,6 @@ EOF
 #  printf "error while changing systemd unit\n"
 #  exit 1
 #}
-#touch /etc/systemd/system/com.filemaker.httpd.start.service.d/override.conf
 #mkdir -p /etc/systemd/system/com.filemaker.httpd.start.service.d/
 #cat >/etc/systemd/system/com.filemaker.httpd.start.service.d/override.conf <<EOF
 #[Service]

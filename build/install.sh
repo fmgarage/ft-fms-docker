@@ -9,6 +9,11 @@ docker -v | grep -q version || {
   exit 1
 }
 
+# get OS and set md5 command, set into var
+md5sum="md5sum"
+[[ $(uname) == darwin ]] && md5sum="md5"
+
+
 # go to working dir
 pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
@@ -97,7 +102,11 @@ admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 #    ;;
   "")
     # todo while valid (check if exists)
-    project_id=$(uuidgen | md5sum | cut -c-12)  # | cut -c-12
+    # todo md5|md5sum
+    project_id=$(uuidgen | $md5sum | cut -c-12) || {
+      printf "error while generating project id\n"
+      exit 1
+    }
     echo "id: " "$project_id"
     ;;
   (*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)

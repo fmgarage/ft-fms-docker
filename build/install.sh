@@ -3,6 +3,12 @@
 
 # todo check if root
 
+# check docker
+docker -v | grep -q version || {
+  printf "Docker does not appear to run, exiting."
+  exit 1
+}
+
 # go to working dir
 pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1

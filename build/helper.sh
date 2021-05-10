@@ -100,6 +100,19 @@ EOF
 #TimeoutStopSec=10s
 #EOF
 
+# fix
+sed -i '/PROG_NAME=fmshelper/s/.*/&\
+HELPER_PROC=fmshelper/' "/opt/FileMaker/FileMaker Server/Database Server/etc/fmshelper" || {
+  printf "error while changing fmshelper script\n"
+  exit 1
+}
+
+sed -i 's/$fmslogtrimmer/fmslogtrimmer/g'  "/opt/FileMaker/FileMaker Server/Database Server/etc/fmshelper" || {
+  printf "error while changing fmshelper script\n"
+  exit 1
+}
+
+
 # remove install packages
 printf "\nremove install packages\n"
 rm -r /root/deps/

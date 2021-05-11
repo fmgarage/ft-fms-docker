@@ -65,7 +65,9 @@ done
 [ -n "$project_id" ] && {
   printf "Found project name: %s\n" "${project_id}"
   old_volumes=$(docker volume ls -q --filter="name=${project_id}$")
-  [ -n "$old_volumes" ] && ./remove_project || exit 1
+  if [ -n "$old_volumes" ]; then
+    ./remove_project || exit 1
+  fi
 }
 
 # set project id

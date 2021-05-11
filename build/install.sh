@@ -5,7 +5,7 @@
 
 # check docker
 docker -v | grep -q version || {
-  printf "Docker does not appear to run, exiting."
+  printf "Docker does not appear to run, exiting.\n"
   exit 1
 }
 
@@ -202,16 +202,22 @@ while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
 done
 
 if [ $old_container -eq 1 ] && [ $rm_service -eq 1 ]; then
-  printf "\nstopping...\n" &&
-    docker stop "${container_name}" &&
-    printf "\nremoving...\n" &&
-    docker rm "${container_name}" || printf "\r"
+  printf "\nstopping...\n"
+  docker stop "${container_name}"
+  printf "\nremoving...\n"
+  docker rm "${container_name}"
 elif [ $old_container -eq 1 ] && [ $rm_service -eq 0 ]; then
   printf "\n Exiting.\n"
   exit 0
 fi
 
-docker ps -aq --filter "name=${build_image_name}" | grep -q . && echo another build container already exists, removing... && docker stop $build_image_name && docker rm $build_image_name || printf "\r"
+if docker ps -aq --filter "name=${build_image_name}" | grep -q . ; then
+  echo another build container already exists, removing...
+  docker stop $build_image_name
+  docker rm $build_image_name
+else
+  printf "\n"
+fi
 
 # create bind volumes
 printf "\n\e[36mCreating directories on host...\e[39m\n"

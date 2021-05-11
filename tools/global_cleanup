@@ -12,7 +12,11 @@ if [ $dangling_volumes_length -gt 0 ]; then
 fi
 
 # remove fms-net when no containers found
-[ $(docker ps -aq -f name="^fms-" | wc -l) -eq 0 ] && printf "removing network fms-net\n" && docker network rm fms-net || printf "found fms container(s), keeping fms docker network \n"
-
+if [ $(docker ps -aq -f name="^fms-" | wc -l) -eq 0 ]; then
+  printf "removing network fms-net\n"
+  docker network rm fms-net
+else
+  printf "found fms container(s), keeping fms docker network \n"
+fi
 printf "\ndone\n"
 exit 0

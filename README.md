@@ -58,7 +58,7 @@ After the installation process is finished, check the Dashboard in Docker Deskto
 
 Open the admin console by clicking the *Open in Browser* button in the container actions. In case you installed without certificate you will have to confirm the self-signed one.
 
-- Chrome: doesn't work with no valid certificate
+- Chrome: does not work without a valid certificate
 - Safari: possible to bypass the certificate warning
 - Edge: possible to bypass the certificate warning, but opened from Docker Dashboard, the URL comes as an `http` link, and you need to append `https://`.
 
@@ -124,8 +124,8 @@ But, due to permissions, this isn't of much use apart from reading files.
 Folders (for databases, backups…) are created on container start but not reconnected if you reboot and start Docker Desktop again. Existing files will not be overwritten, but new volumes must be created and attached to the local folders.
 This happens in the `start_server` script, where the wsl directory is checked before starting the container. It is considered a workaround to this issue: [docker/for-win/issues/10060](https://github.com/docker/for-win/issues/10060)
 
-Sometimes when stopping the server container with `tools/stop_server`, the fmshelper process doesn't exit. We're still figuring out why.
-The StopTimeout for the container is 10 minutes, after that it will be stopped forcefully. You can take a shortcut with `docker stop fms-[name-tag] -t 5` (stop with timeout 5 seconds).
+[comment]: <> (Sometimes when stopping the server container with `tools/stop_server`, the fmshelper process doesn't exit. We're still figuring out why.)
+[comment]: <> (The StopTimeout for the container is 10 minutes, after that it will be stopped forcefully. You can take a shortcut with `docker stop fms-[name-tag] -t 5` &#40;stop with timeout 5 seconds&#41;.)
 
 Docker Desktop for Windows fails to restart, rebooting Windows may be the fastest way solve this. 
 
@@ -152,7 +152,8 @@ Start this server instance.
 **stop_server**
 
 Stops server, you will be prompted to close any open databases.
-(Sometimes doesn't work on Windows, see issues.)
+
+[comment]: <> (Sometimes doesn't work on Windows, see issues.)
 
 **global_cleanup**
 
@@ -166,7 +167,7 @@ This removes any dangling volumes (attached to no container) and also removes th
 
 ### Stopping and Restarting the Server
 
-At the moment, quitting Docker Desktop will not gracefully close your databases or stop the server. To prevent your databases from being corrupted by the hard shutdown, always stop the container with `tools/stop_server` or use the *fmsadmin stop server* command beforehand.
+At the moment, quitting Docker Desktop will not gracefully close your databases or stop the server. To prevent your databases from being corrupted by the hard shutdown, always stop the container in Docker Dashboard, with `tools/stop_server` or use the *fmsadmin stop server* command beforehand.
 
 
 
@@ -192,7 +193,7 @@ It is possible to have multiple instances of these installations, but you can ru
 
 (macOS only)
 
-As all settings and database files are stored in the fma-data folder, you can
+As all settings and database files are stored in the fms-data folder, you can
 
 
 

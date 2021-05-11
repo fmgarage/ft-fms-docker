@@ -100,7 +100,7 @@ EOF
 #TimeoutStopSec=10s
 #EOF
 
-# fix
+# fix fmshelper script
 sed -i '/PROG_NAME=fmshelper/s/.*/&\
 HELPER_PROC=fmshelper/' "/opt/FileMaker/FileMaker Server/Database Server/etc/fmshelper" || {
   printf "error while changing fmshelper script\n"
@@ -108,6 +108,11 @@ HELPER_PROC=fmshelper/' "/opt/FileMaker/FileMaker Server/Database Server/etc/fms
 }
 
 sed -i 's/$fmslogtrimmer/fmslogtrimmer/g'  "/opt/FileMaker/FileMaker Server/Database Server/etc/fmshelper" || {
+  printf "error while changing fmshelper script\n"
+  exit 1
+}
+
+sed -i 's/s SIGKILL/s TERM/g'  "/opt/FileMaker/FileMaker Server/Database Server/etc/fmshelper" || {
   printf "error while changing fmshelper script\n"
   exit 1
 }

@@ -9,10 +9,17 @@ docker -v | grep -q version || {
   exit 1
 }
 
-# get OS and set md5 command, set into var
-md5sum="md5sum"
-[[ $(uname) == darwin ]] && md5sum="md5"
-
+# md5 command
+md5-sum() {
+  if command -v md5sum >/dev/null 2>&1; then
+    md5sum "$@"
+  elif command -v md5 >/dev/null 2>&1; then
+    md5 "$@"
+  else
+    printf "Error: no md5 command found\n"
+    exit 1
+  fi
+}
 
 # go to working dir
 pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
@@ -89,41 +96,32 @@ admin_user=$(get_setting "Admin Console User" ./"$assisted_install")
 admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 
 # set project id
-# todo wording, enter name or empty for id
 #while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
-  printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
-  read -r user_input
+printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
+read -r user_input
 
-  case $user_input in
-#  Y | y)
-#    printf "Enter project name:\n"
-#    read -r project_id
-#    # todo while valid (check if exists)
-#    ;;
-  "")
-    # todo while valid (check if exists)
-    # todo md5|md5sum
-    project_id=$(uuidgen | $md5sum | cut -c-12) || {
-      printf "error while generating project id\n"
-      exit 1
-    }
-    echo "id: " "$project_id"
-    ;;
-  (*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
-    echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
+case $user_input in
+"")
+  # todo while valid (check if exists)
+  project_id=$(uuidgen | md5-sum "$@" | cut -c-12) || {
+    printf "error while generating project id\n"
     exit 1
-    ;;
-  *)
-    project_id=$user_input
-#    printf "Enter project name:\n"
-#    read -r project_id
-    # todo while valid (check if exists)
-    ;;
-  esac
+  }
+  echo "id: " "$project_id"
+  ;;
+*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
+  echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
+  exit 1
+  ;;
+*)
+  # todo while valid (check if exists)
+  project_id=$user_input
+  ;;
+esac
 #done
 
 # write to .env
-echo "ID=${project_id}" > ../.env
+echo "ID=${project_id}" >../.env
 
 # volume-paths array
 paths=(
@@ -205,9 +203,9 @@ done
 
 if [ $old_container -eq 1 ] && [ $rm_service -eq 1 ]; then
   printf "\nstopping...\n" &&
-  docker stop "${container_name}" &&
-  printf "\nremoving...\n" &&
-  docker rm "${container_name}" || printf "\r"
+    docker stop "${container_name}" &&
+    printf "\nremoving...\n" &&
+    docker rm "${container_name}" || printf "\r"
 elif [ $old_container -eq 1 ] && [ $rm_service -eq 0 ]; then
   printf "\n Exiting.\n"
   exit 0
@@ -308,7 +306,6 @@ docker stop $build_image_name && docker rm $build_image_name
 # todo
 # backup/zip fms-data directory
 
-
 # check if fms network exists
 network=0
 docker network ls -q --filter "name=^fms-net$" | grep -q . && network=1
@@ -330,7 +327,7 @@ if [[ $start_server -eq 1 ]]; then
   printf "\nDone. Now starting your server ....\n"
   docker-compose $compose_files up -d $service_name
 else
-  compose_files=$(sed 's/..\///g' <<< "$compose_files")
+  compose_files=$(sed 's/..\///g' <<<"$compose_files")
   printf "\nDone. You can now start your server with\e[36m ./tools/start_server\e[39m or \e[36mdocker-compose %s up [-d] %s\e[39m\n" "$compose_files" "$service_name"
 fi
 

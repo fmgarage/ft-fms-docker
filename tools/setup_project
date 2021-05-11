@@ -6,6 +6,18 @@ pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
 parent_dir=$(dirname "${pwd}")
 
+# md5 command
+md5-sum() {
+  if command -v md5sum >/dev/null 2>&1; then
+    md5sum "$@"
+  elif command -v md5 >/dev/null 2>&1; then
+    md5 "$@"
+  else
+    printf "Error: no md5 command found\n"
+    exit 1
+  fi
+}
+
 # parse config
 function get_setting() {
   grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
@@ -64,7 +76,7 @@ read -r user_input
 case $user_input in
 "")
   # todo while valid (check if exists)
-  project_id=$(uuidgen | md5 | cut -c-12) # | cut -c-12
+  project_id=$(uuidgen | md5-sum "$@" | cut -c-12) # | cut -c-12
   echo "id: " "$project_id"
   ;;
 (*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)

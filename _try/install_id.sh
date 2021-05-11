@@ -24,6 +24,18 @@ paths=(
   "fms-webpub-conf" "/Web Publishing/conf/"
 )
 
+# md5 command
+md5-sum() {
+  if command -v md5sum >/dev/null 2>&1; then
+    md5sum "$@"
+  elif command -v md5 >/dev/null 2>&1; then
+    md5 "$@"
+  else
+    printf "Error: no md5 command found\n"
+    exit 1
+  fi
+}
+
 # parse config
 function get_setting() {
   grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
@@ -39,24 +51,25 @@ function check_setting() {
 # set project id
 # todo wording
 #while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
-  printf "Do you want to enter a project name [y] or do you want an automatic ID assigned to this instance [n] ? [y/n]"
+  printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
   read -r user_input
 
   case $user_input in
-  Y | y)
-    printf "Enter project name:\n"
-    read -r project_id
+  "")
     # todo while valid (check if exists)
+    project_id=$(uuidgen | md5-sum "$@" | cut -c-12)
+    echo "id: " "$project_id"
     ;;
-  N | n)
-    # todo while valid (check if exists)
-    project_id=$(uuidgen | md5)
-    echo "$project_id"
+  (*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
+    echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
+    exit 1
     ;;
   *)
-    echo Please enter [y]es or [n]o
+    project_id=$user_input
+    # todo while valid (check if exists)
     ;;
   esac
+
 #done
 # todo write to .env
 echo "ID=${project_id}" > ../.env

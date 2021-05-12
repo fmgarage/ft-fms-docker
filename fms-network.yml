@@ -1,0 +1,10 @@
+version: '3.9'
+
+networks:
+    fms:
+        name: fms-net
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+            - subnet: 172.20.0.0/16

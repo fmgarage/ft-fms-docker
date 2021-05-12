@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+##!/bin/bash
+
+# remove volumes with no container
+dangling_volumes=$(docker volume ls -q -f name="^fms-" -f dangling=true)
+dangling_volumes_length=$(awk 'NF {print $0}' <<<  "$dangling_volumes" | wc -l)
+if [ $dangling_volumes_length -gt 0 ]; then
+  docker volume rm $dangling_volumes || {
+    printf "error while removing volumes"
+    exit 1
+  }
+fi
+
+# remove fms-net when no containers found
+if [ $(docker ps -aq -f name="^fms-" | wc -l) -eq 0 ]; then
+  printf "removing network fms-net\n"
+  docker network rm fms-net
+else
+  printf "found fms container(s), keeping fms docker network \n"
+fi
+printf "\ndone\n"
+exit 0

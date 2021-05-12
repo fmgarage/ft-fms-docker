@@ -1,74 +1,23 @@
-version: '3.7'
+version: '3.9'
 services:
-  fms-c:
-    image: centos-fms-c-19_2:latest
-    container_name: fms-c
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      # - ./databases/:/opt/FileMaker/FileMaker Server/Data/Databases/
-      - data-admin-conf:/opt/FileMaker/FileMaker Server/Admin/conf:delegated
-      - data-conf:/opt/FileMaker/FileMaker Server/conf:delegated
-      - data-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
-      - data-data-databases:/opt/FileMaker/FileMaker Server/Data/Databases/:delegated
-      - data-data-preferences:/opt/FileMaker/FileMaker Server/Data/Preferences/:delegated
-      - data-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
-      - data-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
-      - data-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
-      - data-http-logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs:delegated
-      - data-logs:/opt/FileMaker/FileMaker Server/Logs:delegated
-      - data-webpub-conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf:delegated
-    tmpfs:
-      - /tmp
-      - /run
-      - /run/lock
-    security_opt:
-      - seccomp:unconfined
-    user: root
-    environment:
-      - container=docker
-    cap_add:
-      - SYS_ADMIN
-    ports:
-      - 80:80
-      - 443:443
-      - 2399:2399
-      - 5003:5003
-      - 16000-16002:16000-16002
-    networks:
-      fms:
-        ipv4_address: 172.20.0.11
-    logging:
-      driver: "json-file"
-      options:
-        mode: "non-blocking"
-        max-size: "10m"
-        max-file: "5"
-    # init: true
-    # privileged: true
-    stop_signal: SIGRTMIN+3
-    stop_grace_period: 20m
-    restart: "no"
-    stdin_open: true
-    tty: true
-    # command: bash
 
   fms:
     image: centos-fms-19_2:latest
-    container_name: fms
+    container_name: fms-${ID}
     hostname: fms
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - data-admin-conf:/opt/FileMaker/FileMaker Server/Admin/conf:delegated
-      - data-conf:/opt/FileMaker/FileMaker Server/conf:delegated
-      - data-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
-      - data-data-databases:/opt/FileMaker/FileMaker Server/Data/Databases/:delegated
-      - data-data-preferences:/opt/FileMaker/FileMaker Server/Data/Preferences/:delegated
-      - data-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
-      - data-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
-      - data-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
-      - data-http-logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs:delegated
-      - data-logs:/opt/FileMaker/FileMaker Server/Logs:delegated
-      - data-webpub-conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf:delegated
+      - fms-admin-conf:/opt/FileMaker/FileMaker Server/Admin/conf:delegated
+      - fms-conf:/opt/FileMaker/FileMaker Server/conf:delegated
+      - fms-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
+      - fms-data-databases:/opt/FileMaker/FileMaker Server/Data/Databases/:delegated
+      - fms-data-preferences:/opt/FileMaker/FileMaker Server/Data/Preferences/:delegated
+      - fms-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
+      - fms-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
+      - fms-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
+      - fms-http-logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs:delegated
+      - fms-logs:/opt/FileMaker/FileMaker Server/Logs:delegated
+      - fms-webpub-conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf:delegated
     tmpfs:
       - /tmp
       - /run
@@ -80,6 +29,7 @@ services:
       - container=docker
     cap_add:
       - SYS_ADMIN
+#      - SYS_PTRACE # only for debugging!
     ports:
       - 80:80
       - 443:443
@@ -98,7 +48,7 @@ services:
     # init: true
     # privileged: true
     stop_signal: SIGRTMIN+3
-    stop_grace_period: 20m
+    stop_grace_period: 10m
     restart: "no"
     stdin_open: true
     tty: true
@@ -167,35 +117,44 @@ services:
     # command: bash
 
 networks:
-    fms:
-        driver: bridge
-        ipam:
-            driver: default
-            config:
-            - subnet: 172.20.0.0/16
+  fms:
+    external:
+      name: fms-net
 
 volumes:
 #  tmpvolume:
 #    external: true
-  data-admin-conf:
+#  fms-admin-conf:
+  fms-admin-conf:
+    name: fms-admin-conf-${ID}
     external: true
-  data-dbserver-extensions:
+  fms-dbserver-extensions:
+    name: fms-dbserver-extensions-${ID}
     external: true
-  data-data-backups:
+  fms-data-backups:
+    name: fms-data-backups-${ID}
     external: true
-  data-data-databases:
+  fms-data-databases:
+    name: fms-data-databases-${ID}
     external: true
-  data-data-preferences:
+  fms-data-preferences:
+    name: fms-data-preferences-${ID}
     external: true
-  data-conf:
+  fms-conf:
+    name: fms-conf-${ID}
     external: true
-  data-http-dotconf:
+  fms-http-dotconf:
+    name: fms-http-dotconf-${ID}
     external: true
-  data-http-conf:
+  fms-http-conf:
+    name: fms-http-conf-${ID}
     external: true
-  data-http-logs:
+  fms-http-logs:
+    name: fms-http-logs-${ID}
     external: true
-  data-logs:
+  fms-logs:
+    name: fms-logs-${ID}
     external: true
-  data-webpub-conf:
+  fms-webpub-conf:
+    name: fms-webpub-conf-${ID}
     external: true

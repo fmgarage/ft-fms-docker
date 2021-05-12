@@ -66,7 +66,7 @@ done
   printf "Found project name: %s\n" "${project_id}"
   old_volumes=$(docker volume ls -q --filter="name=${project_id}$")
   if [ -n "$old_volumes" ]; then
-    ./remove_project || exit 1
+    ./remove_project.sh || exit 1
   fi
 }
 

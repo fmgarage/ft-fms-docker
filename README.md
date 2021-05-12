@@ -27,10 +27,9 @@ Clone or download the repo and move it to your documents folder. You may rename 
 ```
 
 
-
 ### FileMaker Server
 
-Download a copy of the FileMaker Server installer for Linux from your Claris account page, unpack the zip file and move the Red Hat Package Manager (rpm) file to the build folder in the repo. You can also put a  link into the config.txt, the installer will be downloaded instead then. 
+Download a copy of the FileMaker Server installer for Linux from your Claris account page, unpack the zip file and move the Red Hat Package Manager (rpm) file to the build folder in the repo. You can also put a link into the config.txt instead, the installer will be downloaded then.
 
 With the current version of the installer it will look like this:
 
@@ -52,15 +51,17 @@ If you have a certificate that you might want to use for this server, simply cop
 
 FileMaker Server requires port 5003 to start, so make sure to quit any FileMaker Pro client before proceeding.
 
-Open Terminal.app, drag the **install.sh** into the terminal window, hit return and give your server instance a name. Or just let it be tagged with an ID.
+Open Terminal.app, drag the `install.sh` from the `build` folder into the terminal window, hit return and give your server instance a name. Or just let it be tagged with an ID.
 
 After the installation process is finished, check the Dashboard in Docker Desktop, there should be a running container named **fms-[name-tag]**.
 
-Open the admin console by clicking the *Open in Browser* button in the container actions. In case you installed without certificate you will have to confirm the self-signed one.
+Open the admin console by clicking the *Open in Browser* button in the container actions or try with https://localhost:16000. In case you installed without certificate you will have to confirm the self-signed one.
 
-- Chrome: does not work without a valid certificate
-- Safari: possible to bypass the certificate warning
-- Edge: possible to bypass the certificate warning, but opened from Docker Dashboard, the URL comes as an `http` link, and you need to append `https://`.
+
+Mind that:
+- **Chrome** does not work without a valid certificate
+- **Safari** lets you bypass the certificate warning
+- **Edge** lets you bypass the certificate warning, but opened from Docker Dashboard, the URL comes as an `http` link, and you need to append `https://`.
 
 Clicking the CLI button will open a terminal window where you can use the fmsadmin command to control your server.
 
@@ -68,11 +69,11 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 
 ## Installation on Windows 10
 
-**Important**: As of now it is not possible to run both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 on launch and it is not possible to make a connection to the local server. 
+**Important**: As of now it is not possible to run both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 on launch, and it is not possible to make a connection to the local server. 
 
 In addition to the macOS instructions you will have to install the Windows Subsystem for Linux **WSL** first. To do so, follow these instructions: https://docs.microsoft.com/de-de/windows/wsl/install-win10 ("Manual Installation Steps").
 
-Download and install Ubuntu from the Windows Store (Ubuntu and Ubuntu 20.04 apps are identical), just make sure it is the one offered by Canonical Group Limited.
+Download and install Ubuntu from the Windows Store. The `Ubuntu` and `Ubuntu 20.04` apps are identical, just make sure it is the one offered by Canonical Group Limited.
 When installed, update packages:
 ```shell
 sudo apt update
@@ -137,27 +138,26 @@ To handle some issues and restrictions, there are scripts for controlling your s
 
 
 
-**setup_project**
+**setup_project.sh**
 
 Lets you set a project name or ID and creates bind volumes. Also looks for fms-data directories.
 
-**remove_project**
+**remove_project.sh**
 
 Removes bind volumes and container, but not the fms-data directory. Delete project directory by hand.
 
-**start_server**
+**start_server.sh**
 
 Start this server instance.
 
-**stop_server**
+**stop_server.sh**
 
 Stops server, you will be prompted to close any open databases.
 
-[comment]: <> (Sometimes doesn't work on Windows, see issues.)
-
-**global_cleanup**
+**global_cleanup.sh**
 
 This removes any dangling volumes (attached to no container) and also removes the docker network `fms-net`, when no container named `fms-*` is left.
+It is necessary especially on Windows, where bind volumes get recreated after every reboot, and the old ones persist.
 
 ### 
 

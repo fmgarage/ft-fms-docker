@@ -5,8 +5,13 @@ Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything 
 
 We are constantly improving the scripts and try to get rid of the remaining issues. If you want to stay up-to-date, make sure to watch the repo and maybe follow us on Twitter: [@fmgarage](https://twitter.com/fmgarage)
 
+- [Installation on macOS](#installation-on-macos)
 
+- [Installation on Windows 10](#installation-on-windows-10)
 
+- [Tools](#tools)
+
+- [Administration](#administration)
 
 ## Installation on macOS
 
@@ -72,7 +77,8 @@ Clicking the CLI button will open a terminal window where you can use the fmsadm
 
 ## Installation on Windows 10
 
-**Important**: As of now it is not possible to run both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 on launch, and it is not possible to make a connection to the local server. 
+**Important**: As of now, there is a caveat when running both FileMaker Server (in Docker) and FileMaker Pro at the same time on a Windows machine. FileMaker Pro also binds port 5003 (exclusively) on launch, and it is not possible to make a connection to the local server.  
+There is a workaround though: If you open port 5003 before, with a tool like [TCP Listen](https://www.allscoop.com/tcp-listen.php), FileMaker Pro cannot take that port and instead accesses FileMaker Server in the Docker environment. 
 
 #### WSL2
 

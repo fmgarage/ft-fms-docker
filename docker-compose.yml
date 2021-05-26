@@ -2,7 +2,8 @@ version: '3.9'
 services:
 
   fms:
-    image: centos-fms-19_2:latest
+    image: ubuntu-fms-19_3:latest
+#    image: centos-fms-19_2:latest
     container_name: fms-${ID}
     hostname: fms
     volumes:

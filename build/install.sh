@@ -138,43 +138,54 @@ paths=(
   "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
 )
 
-#if [[ ! $c_cert ]] || [[ ! $c_bundle ]] || [[ ! $c_key ]]; then
-#  image_name=centos-fms-19_2
-#  service_name=fms
-#  container_name=fms-${project_id}
-#else
-#  image_name=centos-fms-c-19_2
-#  service_name=fms-c
-#  container_name=fms-c-${project_id}
-#fi
-
-image_name=centos-fms-19_2
-service_name=fms
-container_name=fms-${project_id}
-
-build_image_name=fmsinstall
-# todo pin version tag / digest
-base_image=jrei/systemd-centos:7
-date=$(date +%Y-%m-%d)
-
 # download filemaker_server package
+#TODO identify CentOS or Ubuntu package
 package_remove=0
-package=$(find . -name "*.rpm")
-plines=$(wc -l <<<"$package")
+# look for installer locally
+package=$(find . -name "*.deb" -o -name "*.rpm")
+
+# download from URL if not found locally
 if [[ ! $package ]]; then
   printf "\ndownloading fms package ...\n"
   url=$(get_setting "url" ./config.txt)
   STATUS=$(curl -s --head --output /dev/null -w '%{http_code}' "$url")
   if [ ! "$STATUS" -eq 200 ]; then
-    echo "Got a $STATUS from URL: $url ..."
-    exit
+    echo "Error while downloading fms package: Got a $STATUS from URL: $url ..."
+    exit 1
   fi
   curl "${url}" -O || exit
   package_remove=1
-elif [[ $plines -gt 1 ]]; then
-  printf "%s rpm packages found, 1 expected" "$plines"
+fi
+
+# find deb or rpm, set image_name according to installer package
+package=$(find . -name "*.deb")
+image_name=ubuntu-fms-19_3
+# todo pin version tag / digest
+base_image=jrei/systemd-ubuntu:18.04
+helper_script="helper_ubuntu.sh"
+if [[ ! $package ]]; then
+  package=$(find . -name "*.rpm")
+  image_name=centos-fms-19_2
+  # todo pin version tag / digest
+  base_image=jrei/systemd-centos:7
+  helper_script="helper.sh"
+fi
+
+plines=$(wc -l <<<"$package")
+if [[ $plines -gt 1 ]]; then
+  printf "%s fmserver packages found, 1 expected" "$plines"
   exit 1
 fi
+
+# write to .env
+echo "IMAGE=${image_name}" >>../.env
+
+service_name=fms
+container_name=fms-${project_id}
+build_image_name=fmsinstall
+date=$(date +%Y-%m-%d)
+
+
 
 # check if container names are in use
 old_container=0
@@ -271,7 +282,7 @@ docker run -d \
 
 # run install script inside build container
 # todo omit -ti?
-docker exec -ti $build_image_name /root/build/helper.sh
+docker exec -ti $build_image_name /root/build/$helper_script
 if [ ! $? ]; then
   printf "error while installing!"
   docker stop $build_image_name

@@ -43,7 +43,7 @@ function setup_volumes() {
 # check volumes
 function check_volumes() {
   printf "WSL linux, checking bind volumes...\n"
-  if [ "$(find /mnt/wsl/docker-desktop-bind-mounts/${WSL_DISTRO_NAME}/ -maxdepth 1 -type d | wc -l)" -lt 12 ]; then
+  if [ "$(find /mnt/wsl/docker-desktop-bind-mounts/${WSL_DISTRO_NAME}/ -maxdepth 1 -type d | wc -l)" -lt 13 ]; then
     setup_volumes
   fi
 }

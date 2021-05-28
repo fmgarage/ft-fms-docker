@@ -231,6 +231,7 @@ docker run -d \
   -v fms-data-backups-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
   -v fms-data-databases-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
   -v fms-data-preferences-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
+  -v fms-data-scripts-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Scripts":delegated \
   -v fms-dbserver-extensions-"${project_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
   -v fms-http-dotconf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
   -v fms-http-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \

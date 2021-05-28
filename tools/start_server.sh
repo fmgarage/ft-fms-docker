@@ -6,41 +6,16 @@ pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
 parent_dir=$(dirname "${pwd}")
 
-# parse config
-function get_setting() {
-  grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
-}
+# Load Variables
+source ../common/settings.sh
+source ../common/paths.sh
 
-function check_setting() {
-  if [[ $(wc -l <<<"$1") -gt 1 ]]; then
-    echo "multiple values found, 1 expected" >&2
-    exit 1
-  fi
-}
-
-# get settings from config
-project_id=$(get_setting "ID" ../.env)
-check_setting "$project_id"
 [ -z "$project_id" ] && {
   printf "error: project ID empty!\nrun setup_project to set an ID.\n"
   exit 1
 }
 
 function setup_volumes() {
-  # volume-paths array
-  paths=(
-    "fms-admin-conf-${project_id}" "/Admin/conf/"
-    "fms-data-backups-${project_id}" "/Data/Backups/"
-    "fms-data-databases-${project_id}" "/Data/Databases/"
-    "fms-data-preferences-${project_id}" "/Data/Preferences/"
-    "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
-    "fms-conf-${project_id}" "/conf/"
-    "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
-    "fms-http-conf-${project_id}" "/HTTPServer/conf/"
-    "fms-http-logs-${project_id}" "/HTTPServer/logs/"
-    "fms-logs-${project_id}" "/Logs/"
-    "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
-  )
 
   # check directories
   printf "\n\e[36mChecking directories on host...\e[39m\n"
@@ -80,7 +55,8 @@ else
 fi
 
 volume_count=$(docker volume ls -q --filter="name=${project_id}$")
-if [[ $(wc -l <<<"$volume_count") -ne 11 ]]; then # todo get volume count from path array
+volume_count_goal=$(expr ${#paths[@]} / 2)
+if [[ $(wc -l <<<"$volume_count") -ne $volume_count_goal ]]; then
   echo "setting up volumes"
   setup_volumes
 fi

@@ -12,6 +12,7 @@ services:
       - fms-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
       - fms-data-databases:/opt/FileMaker/FileMaker Server/Data/Databases/:delegated
       - fms-data-preferences:/opt/FileMaker/FileMaker Server/Data/Preferences/:delegated
+      - fms-data-scripts:/opt/FileMaker/FileMaker Server/Data/Scripts/:delegated
       - fms-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
       - fms-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
       - fms-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
@@ -88,6 +89,9 @@ volumes:
     external: true
   fms-data-preferences:
     name: fms-data-preferences-${ID}
+    external: true
+  fms-data-scripts:
+    name: fms-data-scripts-${ID}
     external: true
   fms-conf:
     name: fms-conf-${ID}

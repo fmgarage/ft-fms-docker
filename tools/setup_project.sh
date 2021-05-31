@@ -18,36 +18,9 @@ md5-sum() {
   fi
 }
 
-# parse config
-function get_setting() {
-  grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
-}
-
-function check_setting() {
-  if [[ $(wc -l <<<"$1") -gt 1 ]]; then
-    echo "multiple values found, 1 expected" >&2
-    exit 1
-  fi
-}
-
-# get settings from config
-project_id=$(get_setting "ID" ../.env)
-check_setting "$project_id"
-
-# volume-paths array
-paths=(
-  "fms-admin-conf-${project_id}" "/Admin/conf/"
-  "fms-data-backups-${project_id}" "/Data/Backups/"
-  "fms-data-databases-${project_id}" "/Data/Databases/"
-  "fms-data-preferences-${project_id}" "/Data/Preferences/"
-  "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
-  "fms-conf-${project_id}" "/conf/"
-  "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
-  "fms-http-conf-${project_id}" "/HTTPServer/conf/"
-  "fms-http-logs-${project_id}" "/HTTPServer/logs/"
-  "fms-logs-${project_id}" "/Logs/"
-  "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
-)
+# Load Variables
+#source ../common/settings.sh
+source ../common/paths.sh
 
 # check directories
 printf "\n\e[36mChecking directories on host...\e[39m\n"
@@ -91,23 +64,14 @@ case $user_input in
   ;;
 esac
 
-# write to .env
-echo "ID=${project_id}" >../.env
+# update in .env
+sed -i "s/ID=*/ID=${project_id}/g"  ../.env || {
+  printf "error while writing ID to .env\n"
+  exit 1
+}
 
-# reset paths
-paths=(
-  "fms-admin-conf-${project_id}" "/Admin/conf/"
-  "fms-data-backups-${project_id}" "/Data/Backups/"
-  "fms-data-databases-${project_id}" "/Data/Databases/"
-  "fms-data-preferences-${project_id}" "/Data/Preferences/"
-  "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
-  "fms-conf-${project_id}" "/conf/"
-  "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
-  "fms-http-conf-${project_id}" "/HTTPServer/conf/"
-  "fms-http-logs-${project_id}" "/HTTPServer/logs/"
-  "fms-logs-${project_id}" "/Logs/"
-  "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
-)
+# Reset variables
+source ../common/paths.sh
 
 # create bind volumes
 printf "\n\e[36mcreating volumes...\e[39m\n"

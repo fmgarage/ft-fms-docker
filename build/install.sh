@@ -27,21 +27,6 @@ cd "$pwd" || exit 1
 parent_dir=$(dirname "${pwd}")
 inside_base_path="/opt/FileMaker/FileMaker Server/"
 
-# volume-paths array
-paths=(
-  "fms-admin-conf" "/Admin/conf/"
-  "fms-data-backups" "/Data/Backups/"
-  "fms-data-databases" "/Data/Databases/"
-  "fms-data-preferences" "/Data/Preferences/"
-  "fms-dbserver-extensions" "/Database Server/Extensions/"
-  "fms-conf" "/conf/"
-  "fms-http-dotconf" "/HTTPServer/.conf/"
-  "fms-http-conf" "/HTTPServer/conf/"
-  "fms-http-logs" "/HTTPServer/logs/"
-  "fms-logs" "/Logs/"
-  "fms-webpub-conf" "/Web Publishing/conf/"
-)
-
 # parse config
 function get_setting() {
   grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
@@ -123,20 +108,8 @@ esac
 # write to .env
 echo "ID=${project_id}" >../.env
 
-# volume-paths array
-paths=(
-  "fms-admin-conf-${project_id}" "/Admin/conf/"
-  "fms-data-backups-${project_id}" "/Data/Backups/"
-  "fms-data-databases-${project_id}" "/Data/Databases/"
-  "fms-data-preferences-${project_id}" "/Data/Preferences/"
-  "fms-dbserver-extensions-${project_id}" "/Database Server/Extensions/"
-  "fms-conf-${project_id}" "/conf/"
-  "fms-http-dotconf-${project_id}" "/HTTPServer/.conf/"
-  "fms-http-conf-${project_id}" "/HTTPServer/conf/"
-  "fms-http-logs-${project_id}" "/HTTPServer/logs/"
-  "fms-logs-${project_id}" "/Logs/"
-  "fms-webpub-conf-${project_id}" "/Web Publishing/conf/"
-)
+# Load paths
+source ../common/paths.sh
 
 # download filemaker_server package
 #TODO identify CentOS or Ubuntu package
@@ -269,6 +242,7 @@ docker run -d \
   -v fms-data-backups-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
   -v fms-data-databases-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
   -v fms-data-preferences-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
+  -v fms-data-scripts-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Scripts":delegated \
   -v fms-dbserver-extensions-"${project_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
   -v fms-http-dotconf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
   -v fms-http-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
@@ -281,8 +255,7 @@ docker run -d \
 }
 
 # run install script inside build container
-# todo omit -ti?
-docker exec -ti $build_image_name /root/build/$helper_script
+docker exec $build_image_name /root/build/$helper_script
 if [ ! $? ]; then
   printf "error while installing!"
   docker stop $build_image_name

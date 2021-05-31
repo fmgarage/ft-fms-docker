@@ -5,26 +5,11 @@
 pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
 
-# parse config
-function get_setting() {
-  grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
-}
-
-function check_setting() {
-  if [[ $(wc -l <<<"$1") -gt 1 ]]; then
-    echo "multiple values found, 1 expected" >&2
-    exit 1
-  fi
-}
-
-# get settings from config
-project_id=$(get_setting "ID" ../.env) || { printf "error while reading .env file\n"; exit 1; }
-check_setting "$project_id"
-[ -z "$project_id" ] && { printf "error: project ID empty!\n"; exit 1; }
-container_name=fms-${project_id}
-
+# Load Variables
+source ../common/settings.sh
 
 # remove container
+container_name=fms-${project_id}
 old_container=0
 running=0
 rm_container=0

@@ -65,7 +65,7 @@ esac
 
 # update in .env
 env_dir="$parent_dir"/.env
-sed -i.bak "s|ID=*|ID=${project_id}|g" "$env_dir" && rm "$env_dir".bak || {
+sed -i.bak "s|ID=.*|ID=${project_id}|g" "$env_dir" && rm "$env_dir".bak || {
   printf "error while writing ID to .env\n"
   exit 1
 }

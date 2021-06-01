@@ -6,7 +6,7 @@ pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
 
 # Load Variables
-source ../common/settings.sh
+source ../common/get_project_id.sh
 
 # remove container
 container_name=fms-${project_id}

@@ -7,7 +7,6 @@ cd "$pwd" || exit 1
 parent_dir=$(dirname "${pwd}")
 
 # Load Variables
-#source ../common/settings.sh
 source ../common/paths.sh
 
 [ -z "$project_id" ] && {

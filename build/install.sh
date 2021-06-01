@@ -28,44 +28,35 @@ parent_dir=$(dirname "${pwd}")
 inside_base_path="/opt/FileMaker/FileMaker Server/"
 
 # parse config
-function get_setting() {
-  grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
-}
-
-function check_setting() {
-  if [[ $(wc -l <<<"$1") -gt 1 ]]; then
-    echo "multiple values found, 1 expected" >&2
-    exit 1
-  fi
-}
+source "$pwd"/../common/settings.sh
 
 # find certificates
 # todo: shorten
 c_bundle=$(find . -name "*.ca-bundle")
-if [[ ! $c_bundle ]]; then
+if [[ -z $c_bundle ]]; then
   c_bundle=$(get_setting "ca-bundle" ./config.txt)
-  check_setting "$c_bundle"
-  if [[ $c_bundle ]]; then
+  check_many "$c_bundle"
+  if [[ -n $c_bundle ]]; then
     cp -v "$c_bundle" . || exit 1
     c_bundle=${c_bundle##*/}
   fi
 fi
 
 c_cert=$(find . -name "*.crt")
-if [[ ! $c_cert ]]; then
+if [[ -z $c_cert ]]; then
   c_cert=$(get_setting "certificate" ./config.txt)
-  check_setting "$c_cert"
-  if [[ $c_cert ]]; then
+  check_many "$c_cert"
+  if [[ -n $c_cert ]]; then
     cp -v "$c_cert" . || exit 1
     c_cert=${c_cert##*/}
   fi
 fi
 
 c_key=$(find . -name "*.pem")
-if [[ ! $c_key ]]; then
+if [[ -z $c_key ]]; then
   c_key=$(get_setting "key-file" ./config.txt)
-  check_setting "$c_key"
-  if [[ $c_key ]]; then
+  check_many "$c_key"
+  if [[ -n $c_key ]]; then
     cp -v "$c_key" . || exit 1
     c_key=${c_key##*/}
   fi
@@ -158,8 +149,6 @@ container_name=fms-${project_id}
 build_image_name=fmsinstall
 date=$(date +%Y-%m-%d)
 
-
-
 # check if container names are in use
 old_container=0
 rm_service=0
@@ -195,7 +184,7 @@ elif [ $old_container -eq 1 ] && [ $rm_service -eq 0 ]; then
   exit 0
 fi
 
-if docker ps -aq --filter "name=${build_image_name}" | grep -q . ; then
+if docker ps -aq --filter "name=${build_image_name}" | grep -q .; then
   echo another build container already exists, removing...
   docker stop $build_image_name
   docker rm $build_image_name

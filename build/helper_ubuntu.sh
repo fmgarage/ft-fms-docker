@@ -76,7 +76,7 @@ fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" -y disable schedule 1 || {
 #EOF
 
 # increase stop timeout to be able close files automatically
-sed -i 's/timeout=20/timeout=60/g'  /opt/FileMaker/etc/init.d/fmshelper || {
+sed -i 's/timeout=20/timeout=30/g'  /opt/FileMaker/etc/init.d/fmshelper || {
   printf "error while changing fmshelper script\n"
   exit 1
 }

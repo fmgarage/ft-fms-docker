@@ -18,8 +18,7 @@ md5-sum() {
   fi
 }
 
-# Load Variables
-#source ../common/settings.sh
+# Load project_id, paths
 source ../common/paths.sh
 
 # check directories
@@ -54,7 +53,7 @@ case $user_input in
   project_id=$(uuidgen | md5-sum "$@" | cut -c-12) # | cut -c-12
   echo "id: " "$project_id"
   ;;
-(*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
+*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
   echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
   exit 1
   ;;
@@ -65,7 +64,8 @@ case $user_input in
 esac
 
 # update in .env
-sed -i "s/ID=*/ID=${project_id}/g"  ../.env || {
+env_dir="$parent_dir"/.env
+sed -i.bak "s|ID=*|ID=${project_id}|g" "$env_dir" && rm "$env_dir".bak || {
   printf "error while writing ID to .env\n"
   exit 1
 }

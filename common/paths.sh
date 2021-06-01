@@ -1,5 +1,5 @@
 _pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source $_pwd/settings.sh
+source "$_pwd"/get_project_id.sh
 
 paths=(
   "fms-admin-conf-${project_id}" "/Admin/conf/"

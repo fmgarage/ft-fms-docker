@@ -55,7 +55,7 @@ else
 fi
 
 volume_count=$(docker volume ls -q --filter="name=${project_id}$")
-volume_count_goal=$(expr ${#paths[@]} / 2)
+volume_count_goal=$((${#paths[@]} / 2))
 if [[ $(wc -l <<<"$volume_count") -ne $volume_count_goal ]]; then
   echo "setting up volumes"
   setup_volumes

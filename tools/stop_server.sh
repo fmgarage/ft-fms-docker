@@ -6,10 +6,10 @@ pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
 
 # Load Variables
-source ../common/get_project_id.sh
+source ../common/get_instance_id.sh
 
 printf "\nStopping your server ....\n"
-docker stop fms-${project_id} || {
+docker stop fms-${instance_id} || {
   printf "error while stopping fms container\n"
   exit 1
 }

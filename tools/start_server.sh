@@ -9,8 +9,8 @@ parent_dir=$(dirname "${pwd}")
 # Load Variables
 source ../common/paths.sh
 
-[ -z "$project_id" ] && {
-  printf "error: project ID empty!\nrun setup_project to set an ID.\n"
+[ -z "$instance_id" ] && {
+  printf "error: instance ID empty!\nrun setup_instance to set an ID.\n"
   exit 1
 }
 
@@ -51,7 +51,7 @@ else
   echo not WSL
 fi
 
-volume_count=$(docker volume ls -q --filter="name=${project_id}$")
+volume_count=$(docker volume ls -q --filter="name=${instance_id}$")
 volume_count_goal=$(( ${#paths[@]} / 2))
 if [[ $(wc -l <<<"$volume_count") -ne $volume_count_goal ]]; then
   echo "setting up volumes"

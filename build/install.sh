@@ -71,19 +71,19 @@ remove_build_dir=$(get_setting "remove_build_dir" ./config.txt)
 admin_user=$(get_setting "Admin Console User" ./"$assisted_install")
 admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 
-# set project id
+# set instance id
 #while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
-printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
+printf "Please enter a name or leave empty for an automatic ID to be assigned to this instance: "
 read -r user_input
 
 case $user_input in
 "")
   # todo while valid (check if exists)
-  project_id=$(uuidgen | md5-sum "$@" | cut -c-12) || {
-    printf "error while generating project id\n"
+  instance_id=$(uuidgen | md5-sum "$@" | cut -c-12) || {
+    printf "error while generating instance id\n"
     exit 1
   }
-  echo "id: " "$project_id"
+  echo "id: " "$instance_id"
   ;;
 *[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
   echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
@@ -91,13 +91,13 @@ case $user_input in
   ;;
 *)
   # todo while valid (check if exists)
-  project_id=$user_input
+  instance_id=$user_input
   ;;
 esac
 #done
 
 # write to .env
-echo "ID=${project_id}" >../.env
+echo "ID=${instance_id}" >../.env
 
 # Load paths
 source ../common/paths.sh
@@ -145,7 +145,7 @@ fi
 echo "IMAGE=${image_name}" >>../.env
 
 service_name=fms
-container_name=fms-${project_id}
+container_name=fms-${instance_id}
 build_image_name=fmsinstall
 date=$(date +%Y-%m-%d)
 
@@ -226,18 +226,18 @@ docker run -d \
   --tmpfs /run/lock \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v "${pwd}":/root/build/ \
-  -v fms-admin-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
-  -v fms-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/conf":delegated \
-  -v fms-data-backups-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
-  -v fms-data-databases-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
-  -v fms-data-preferences-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
-  -v fms-data-scripts-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Scripts":delegated \
-  -v fms-dbserver-extensions-"${project_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
-  -v fms-http-dotconf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
-  -v fms-http-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
-  -v fms-http-logs-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
-  -v fms-logs-"${project_id}":"/opt/FileMaker/FileMaker Server/Logs":delegated \
-  -v fms-webpub-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
+  -v fms-admin-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
+  -v fms-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/conf":delegated \
+  -v fms-data-backups-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
+  -v fms-data-databases-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
+  -v fms-data-preferences-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
+  -v fms-data-scripts-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Scripts":delegated \
+  -v fms-dbserver-extensions-"${instance_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
+  -v fms-http-dotconf-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
+  -v fms-http-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
+  -v fms-http-logs-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
+  -v fms-logs-"${instance_id}":"/opt/FileMaker/FileMaker Server/Logs":delegated \
+  -v fms-webpub-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
   "$base_image" || {
   printf "error while running build container"
   exit 1

@@ -48,37 +48,37 @@ function check_setting() {
   fi
 }
 
-# set project id
+# set instance id
 # todo wording
 #while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
-  printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
+  printf "Please enter a name or leave empty for an automatic ID to be assigned to this instance: "
   read -r user_input
 
   case $user_input in
   "")
     # todo while valid (check if exists)
-    project_id=$(uuidgen | md5-sum "$@" | cut -c-12)
-    echo "id: " "$project_id"
+    instance_id=$(uuidgen | md5-sum "$@" | cut -c-12)
+    echo "id: " "$instance_id"
     ;;
   (*[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
     echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
     exit 1
     ;;
   *)
-    project_id=$user_input
+    instance_id=$user_input
     # todo while valid (check if exists)
     ;;
   esac
 
 #done
 # todo write to .env
-echo "ID=${project_id}" > ../.env
+echo "ID=${instance_id}" > ../.env
 
 # todo set volume names, service
 
 # volume-paths array
 paths=(
-  "fms-admin-conf-${project_id}" "/Admin/conf/"
+  "fms-admin-conf-${instance_id}" "/Admin/conf/"
   "fms-data-backups" "/Data/Backups/"
   "fms-data-databases" "/Data/Databases/"
   "fms-data-preferences" "/Data/Preferences/"
@@ -94,10 +94,10 @@ paths=(
 
 if [[ ! $c_cert ]] || [[ ! $c_bundle ]] || [[ ! $c_key ]]; then
   image_name=centos-fms-19_2
-  service_name=fms-${project_id}
+  service_name=fms-${instance_id}
 else
   image_name=centos-fms-c-19_2
-  service_name=fms-c--${project_id}
+  service_name=fms-c--${instance_id}
 fi
 
 build_image_name=fmsinstall

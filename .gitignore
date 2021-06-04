@@ -6,3 +6,7 @@
 *.rpm
 .idea
 _try
+
+# Data
+fms-data/
+.env

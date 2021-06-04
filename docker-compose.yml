@@ -12,6 +12,7 @@ services:
       - fms-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
       - fms-data-databases:/opt/FileMaker/FileMaker Server/Data/Databases/:delegated
       - fms-data-preferences:/opt/FileMaker/FileMaker Server/Data/Preferences/:delegated
+      - fms-data-scripts:/opt/FileMaker/FileMaker Server/Data/Scripts/:delegated
       - fms-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
       - fms-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
       - fms-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
@@ -54,77 +55,12 @@ services:
     tty: true
     # command: /usr/sbin/init
 
-  d-fms2.fmgarage.com:
-    # reverse proxy test
-    image: centos-fms-19_2:2021-03-25
-    container_name: fms2
-    hostname: d-fms2.fmgarage.com
-    depends_on:
-      - reverse
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      # - ./data/:/opt/FileMaker/FileMaker Server/Data/Databases/
-      # - ./build/:/root/build/
-    tmpfs:
-      - /tmp
-      - /run
-      - /run/lock
-    security_opt:
-      - seccomp:unconfined
-    user: root
-    environment:
-      - container=docker
-    cap_add:
-      - SYS_ADMIN
-    # ports:
-    #   - 80:80
-    #   - 443:443
-    #   - 2399:2399
-    #   - 5003:5003
-    #   - 16000-16002:16000-16002
-    networks:
-      fms:
-        ipv4_address: 172.20.0.12
-    logging:
-      driver: "json-file"
-      options:
-        mode: "non-blocking"
-        max-size: "10m"
-        max-file: "5"
-    # init: true
-    # privileged: true
-    stop_signal: SIGRTMIN+3
-    restart: "no"
-    stdin_open: true
-    tty: true
-    # command: bash
-
-  reverse:
-    container_name: reverse
-    hostname: reverse
-    image: nginx
-    ports:
-      - 80:80
-      - 443:443
-      - 5003:5003
-      - 16000:16000
-    networks:
-      fms:
-        ipv4_address: 172.20.0.50
-    volumes:
-      - ./nginx_config:/etc/nginx
-      - ./nginx_cert/:/etc/ssl/fmg/
-    # command: bash
-
 networks:
   fms:
     external:
       name: fms-net
 
 volumes:
-#  tmpvolume:
-#    external: true
-#  fms-admin-conf:
   fms-admin-conf:
     name: fms-admin-conf-${ID}
     external: true
@@ -139,6 +75,9 @@ volumes:
     external: true
   fms-data-preferences:
     name: fms-data-preferences-${ID}
+    external: true
+  fms-data-scripts:
+    name: fms-data-scripts-${ID}
     external: true
   fms-conf:
     name: fms-conf-${ID}

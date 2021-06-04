@@ -1,5 +1,7 @@
 # fmg-dockerfms
-Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image.
+Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image. 
+
+**The installer already supports the upcoming version 19.3 which runs on Ubuntu 18.04**
 
 **Windows**: there are currently some issues (see below). 
 
@@ -19,7 +21,7 @@ We are constantly improving the scripts and try to get rid of the remaining issu
 
 #### Docker Desktop
 
-Download and install the latest version of Docker Desktop.
+Download and install the latest version of Docker Desktop and make sure docker is running.
 
 
 
@@ -111,7 +113,7 @@ Again, restart Ubuntu by exiting and starting again.
 
 #### Docker Desktop
 
-Download and install the latest version of Docker Desktop.
+Download and install the latest version of Docker Desktop and make sure docker is running.
 
 In the Docker Desktop settings: Under **General**, activate WSL2 based engine and under **Resources > WSL Integration** activate WSL2 support for your Ubuntu installation.
 It may be necessary to restart both Docker Desktop and Ubuntu (or even reboot Windows) to get the integration into a working state. You can test and see if `docker ps` from the Ubuntu terminal throws any error.
@@ -188,13 +190,13 @@ To handle some issues and restrictions, there are scripts for controlling your s
 
 
 
-**setup_project.sh**
+**setup_instance.sh**
 
-Lets you set a project name or ID and creates bind volumes. Also looks for fms-data directories.
+Lets you set an instance name or ID and creates bind volumes. Also looks for fms-data directories.
 
-**remove_project.sh**
+**remove_instance.sh**
 
-Removes volumes and container, but not the fms-data directory. Delete project directory manually.
+Removes volumes and container, but not the fms-data directory. Delete instance directory manually.
 
 **start_server.sh**
 
@@ -241,7 +243,7 @@ Due to permissions, this should only be used read-only.
 
 (macOS only) 
 
-If you need more than one instance, you can simply duplicate an installation (will also duplicate settings, logs and databases, setup new project name with `tools/setup_project`)
+If you need more than one instance, you can simply duplicate an installation (will also duplicate settings, logs and databases, setup new instance name with `tools/setup_instance`)
 
 It is possible to have multiple instances of these installations, but you can run only one at a time. Each installation is bound to its directory, where the `fms-data` (FileMaker Server directories) directory and the `.env` (name-tag) file are located. 
 

@@ -5,13 +5,11 @@
 pwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
 cd "$pwd" || exit 1
 
-# get settings
-source ../common/settings.sh
-[ -z "$project_id" ] && { printf "error: project ID empty!\n"; exit 1; }
-container_name=fms-${project_id}
-
+# Load Variables
+source ../common/get_instance_id.sh
 
 # remove container
+container_name=fms-${instance_id}
 old_container=0
 running=0
 rm_container=0
@@ -53,7 +51,7 @@ fi
 # remove bind volumes
 printf "\n\e[36mremoving docker volumes...\e[39m\n"
 
-docker volume rm $(docker volume ls -q --filter="name=${project_id}$")
+docker volume rm $(docker volume ls -q --filter="name=${instance_id}$")
 
 #for ((i = 0; i < "${#paths[@]}"; i += 2)); do
 #  docker volume rm "${paths[$i]}" || {

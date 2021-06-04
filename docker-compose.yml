@@ -2,7 +2,7 @@ version: '3.9'
 services:
 
   fms:
-    image: centos-fms-19_2:latest
+    image: ${IMAGE}:latest
     container_name: fms-${ID}
     hostname: fms
     volumes:
@@ -46,14 +46,28 @@ services:
         mode: "non-blocking"
         max-size: "10m"
         max-file: "5"
-    # init: true
-    # privileged: true
     stop_signal: SIGRTMIN+3
     stop_grace_period: 10m
     restart: "no"
     stdin_open: true
     tty: true
-    # command: /usr/sbin/init
+
+  reverse:
+    container_name: reverse
+    hostname: reverse
+    image: nginx
+    ports:
+      - 80:80
+      - 443:443
+      - 5003:5003
+      - 16000:16000
+    networks:
+      fms:
+        ipv4_address: 172.20.0.50
+    volumes:
+      - ./nginx_config:/etc/nginx
+      - ./nginx_cert/:/etc/ssl/fmg/
+    # command: bash
 
 networks:
   fms:

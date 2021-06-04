@@ -28,44 +28,35 @@ parent_dir=$(dirname "${pwd}")
 inside_base_path="/opt/FileMaker/FileMaker Server/"
 
 # parse config
-function get_setting() {
-  grep -Ev '^\s*$|^\s*\#' "$2" | grep -E "\s*$1\s*=" | sed 's/.*=//; s/^ //g'
-}
-
-function check_setting() {
-  if [[ $(wc -l <<<"$1") -gt 1 ]]; then
-    echo "multiple values found, 1 expected" >&2
-    exit 1
-  fi
-}
+source "$pwd"/../common/settings.sh
 
 # find certificates
 # todo: shorten
 c_bundle=$(find . -name "*.ca-bundle")
-if [[ ! $c_bundle ]]; then
+if [[ -z $c_bundle ]]; then
   c_bundle=$(get_setting "ca-bundle" ./config.txt)
-  check_setting "$c_bundle"
-  if [[ $c_bundle ]]; then
+  check_many "$c_bundle"
+  if [[ -n $c_bundle ]]; then
     cp -v "$c_bundle" . || exit 1
     c_bundle=${c_bundle##*/}
   fi
 fi
 
 c_cert=$(find . -name "*.crt")
-if [[ ! $c_cert ]]; then
+if [[ -z $c_cert ]]; then
   c_cert=$(get_setting "certificate" ./config.txt)
-  check_setting "$c_cert"
-  if [[ $c_cert ]]; then
+  check_many "$c_cert"
+  if [[ -n $c_cert ]]; then
     cp -v "$c_cert" . || exit 1
     c_cert=${c_cert##*/}
   fi
 fi
 
 c_key=$(find . -name "*.pem")
-if [[ ! $c_key ]]; then
+if [[ -z $c_key ]]; then
   c_key=$(get_setting "key-file" ./config.txt)
-  check_setting "$c_key"
-  if [[ $c_key ]]; then
+  check_many "$c_key"
+  if [[ -n $c_key ]]; then
     cp -v "$c_key" . || exit 1
     c_key=${c_key##*/}
   fi
@@ -80,19 +71,19 @@ remove_build_dir=$(get_setting "remove_build_dir" ./config.txt)
 admin_user=$(get_setting "Admin Console User" ./"$assisted_install")
 admin_pass=$(get_setting "Admin Console Password" ./"$assisted_install")
 
-# set project id
+# set instance id
 #while [ $is_valid -eq 0 ] && [ $old_container -eq 1 ]; do
-printf "Please enter a project name or leave empty for an automatic ID to be assigned to this instance: "
+printf "Please enter a name or leave empty for an automatic ID to be assigned to this instance: "
 read -r user_input
 
 case $user_input in
 "")
   # todo while valid (check if exists)
-  project_id=$(uuidgen | md5-sum "$@" | cut -c-12) || {
-    printf "error while generating project id\n"
+  instance_id=$(uuidgen | md5-sum "$@" | cut -c-12) || {
+    printf "error while generating instance id\n"
     exit 1
   }
-  echo "id: " "$project_id"
+  echo "id: " "$instance_id"
   ;;
 *[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_.-]*)
   echo >&2 "That ID is not allowed. Please use only characters [a-zA-Z0-9_.-]"
@@ -100,54 +91,62 @@ case $user_input in
   ;;
 *)
   # todo while valid (check if exists)
-  project_id=$user_input
+  instance_id=$user_input
   ;;
 esac
 #done
 
 # write to .env
-echo "ID=${project_id}" >../.env
+echo "ID=${instance_id}" >../.env
 
 # Load paths
 source ../common/paths.sh
 
-#if [[ ! $c_cert ]] || [[ ! $c_bundle ]] || [[ ! $c_key ]]; then
-#  image_name=centos-fms-19_2
-#  service_name=fms
-#  container_name=fms-${project_id}
-#else
-#  image_name=centos-fms-c-19_2
-#  service_name=fms-c
-#  container_name=fms-c-${project_id}
-#fi
-
-image_name=centos-fms-19_2
-service_name=fms
-container_name=fms-${project_id}
-
-build_image_name=fmsinstall
-# todo pin version tag / digest
-base_image=jrei/systemd-centos:7
-date=$(date +%Y-%m-%d)
-
 # download filemaker_server package
 package_remove=0
-package=$(find . -name "*.rpm")
-plines=$(wc -l <<<"$package")
+# look for installer locally
+package=$(find . -name "*.deb" -o -name "*.rpm")
+
+# download from URL if not found locally
 if [[ ! $package ]]; then
   printf "\ndownloading fms package ...\n"
   url=$(get_setting "url" ./config.txt)
   STATUS=$(curl -s --head --output /dev/null -w '%{http_code}' "$url")
   if [ ! "$STATUS" -eq 200 ]; then
-    echo "Got a $STATUS from URL: $url ..."
-    exit
+    echo "Error while downloading fms package: Got a $STATUS from URL: $url ..."
+    exit 1
   fi
   curl "${url}" -O || exit
   package_remove=1
-elif [[ $plines -gt 1 ]]; then
-  printf "%s rpm packages found, 1 expected" "$plines"
+fi
+
+# find deb or rpm, set image_name according to installer package
+package=$(find . -name "*.deb")
+image_name=ubuntu-fms-19_3
+# todo pin version tag / digest
+base_image=jrei/systemd-ubuntu:18.04
+helper_script="helper_ubuntu.sh"
+if [[ ! $package ]]; then
+  package=$(find . -name "*.rpm")
+  image_name=centos-fms-19_2
+  # todo pin version tag / digest
+  base_image=jrei/systemd-centos:7
+  helper_script="helper.sh"
+fi
+
+plines=$(wc -l <<<"$package")
+if [[ $plines -gt 1 ]]; then
+  printf "%s fmserver packages found, 1 expected" "$plines"
   exit 1
 fi
+
+# write to .env
+echo "IMAGE=${image_name}" >>../.env
+
+service_name=fms
+container_name=fms-${instance_id}
+build_image_name=fmsinstall
+date=$(date +%Y-%m-%d)
 
 # check if container names are in use
 old_container=0
@@ -184,7 +183,7 @@ elif [ $old_container -eq 1 ] && [ $rm_service -eq 0 ]; then
   exit 0
 fi
 
-if docker ps -aq --filter "name=${build_image_name}" | grep -q . ; then
+if docker ps -aq --filter "name=${build_image_name}" | grep -q .; then
   echo another build container already exists, removing...
   docker stop $build_image_name
   docker rm $build_image_name
@@ -226,26 +225,25 @@ docker run -d \
   --tmpfs /run/lock \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v "${pwd}":/root/build/ \
-  -v fms-admin-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
-  -v fms-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/conf":delegated \
-  -v fms-data-backups-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
-  -v fms-data-databases-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
-  -v fms-data-preferences-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
-  -v fms-data-scripts-"${project_id}":"/opt/FileMaker/FileMaker Server/Data/Scripts":delegated \
-  -v fms-dbserver-extensions-"${project_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
-  -v fms-http-dotconf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
-  -v fms-http-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
-  -v fms-http-logs-"${project_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
-  -v fms-logs-"${project_id}":"/opt/FileMaker/FileMaker Server/Logs":delegated \
-  -v fms-webpub-conf-"${project_id}":"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
+  -v fms-admin-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
+  -v fms-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/conf":delegated \
+  -v fms-data-backups-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Backups":delegated \
+  -v fms-data-databases-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Databases":delegated \
+  -v fms-data-preferences-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Preferences":delegated \
+  -v fms-data-scripts-"${instance_id}":"/opt/FileMaker/FileMaker Server/Data/Scripts":delegated \
+  -v fms-dbserver-extensions-"${instance_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
+  -v fms-http-dotconf-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
+  -v fms-http-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
+  -v fms-http-logs-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
+  -v fms-logs-"${instance_id}":"/opt/FileMaker/FileMaker Server/Logs":delegated \
+  -v fms-webpub-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
   "$base_image" || {
   printf "error while running build container"
   exit 1
 }
 
 # run install script inside build container
-# todo omit -ti?
-docker exec -ti $build_image_name /root/build/helper.sh
+docker exec $build_image_name /root/build/$helper_script
 if [ ! $? ]; then
   printf "error while installing!"
   docker stop $build_image_name

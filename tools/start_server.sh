@@ -7,11 +7,10 @@ cd "$pwd" || exit 1
 parent_dir=$(dirname "${pwd}")
 
 # Load Variables
-source ../common/settings.sh
 source ../common/paths.sh
 
-[ -z "$project_id" ] && {
-  printf "error: project ID empty!\nrun setup_project to set an ID.\n"
+[ -z "$instance_id" ] && {
+  printf "error: instance ID empty!\nrun setup_instance to set an ID.\n"
   exit 1
 }
 
@@ -21,7 +20,7 @@ function setup_volumes() {
   printf "\n\e[36mChecking directories on host...\e[39m\n"
   for ((i = 1; i < "${#paths[@]}"; i += 2)); do
     if [[ ! -d "$parent_dir/fms-data${paths[$i]}" ]]; then
-      printf "Directories in fms-data do not exist!" >&2
+      printf "Directory %s in fms-data do not exist!" "${paths[$i]}" >&2
       exit 1
     fi
   done
@@ -36,8 +35,6 @@ function setup_volumes() {
   done
 
   printf "\nVolumes are setup.\n"
-  #  exit 0
-
 }
 
 # check volumes
@@ -54,8 +51,8 @@ else
   echo not WSL
 fi
 
-volume_count=$(docker volume ls -q --filter="name=${project_id}$")
-volume_count_goal=$((${#paths[@]} / 2))
+volume_count=$(docker volume ls -q --filter="name=${instance_id}$")
+volume_count_goal=$(( ${#paths[@]} / 2))
 if [[ $(wc -l <<<"$volume_count") -ne $volume_count_goal ]]; then
   echo "setting up volumes"
   setup_volumes

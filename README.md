@@ -1,5 +1,7 @@
 # fmg-dockerfms
-Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image. **Now ready for FMS 19.3/Ubuntu**
+Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image. 
+
+**The installer already supports the upcoming version 19.3 which runs on Ubuntu 18.04**
 
 **Windows**: there are currently some issues (see below). 
 

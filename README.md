@@ -1,5 +1,5 @@
 # fmg-dockerfms
-Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image.
+Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image. **Now ready for FMS 19.3/Ubuntu**
 
 **Windows**: there are currently some issues (see below). 
 
@@ -19,7 +19,7 @@ We are constantly improving the scripts and try to get rid of the remaining issu
 
 #### Docker Desktop
 
-Download and install the latest version of Docker Desktop.
+Download and install the latest version of Docker Desktop and make sure docker is running.
 
 
 

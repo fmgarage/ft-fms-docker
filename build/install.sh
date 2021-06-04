@@ -103,7 +103,6 @@ echo "ID=${instance_id}" >../.env
 source ../common/paths.sh
 
 # download filemaker_server package
-#TODO identify CentOS or Ubuntu package
 package_remove=0
 # look for installer locally
 package=$(find . -name "*.deb" -o -name "*.rpm")

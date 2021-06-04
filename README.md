@@ -111,7 +111,7 @@ Again, restart Ubuntu by exiting and starting again.
 
 #### Docker Desktop
 
-Download and install the latest version of Docker Desktop.
+Download and install the latest version of Docker Desktop and make sure docker is running.
 
 In the Docker Desktop settings: Under **General**, activate WSL2 based engine and under **Resources > WSL Integration** activate WSL2 support for your Ubuntu installation.
 It may be necessary to restart both Docker Desktop and Ubuntu (or even reboot Windows) to get the integration into a working state. You can test and see if `docker ps` from the Ubuntu terminal throws any error.

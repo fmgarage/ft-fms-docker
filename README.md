@@ -211,7 +211,6 @@ Stops server, you will be prompted to close any open databases.
 This removes any dangling volumes (attached to no container) and also removes the docker network `fms-net`, when no container named `fms-*` is left.
 It is necessary especially on Windows, where bind volumes get recreated after every reboot, and the old ones persist.
 
-### 
 
 
 ## Administration

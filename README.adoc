@@ -1,4 +1,5 @@
-= fmg-dockerfms
+= ft-fms-docker
+(as *fmg-dockerfms*)
 :experimental:
 
 Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image. *Now ready for FMS 19.3/Ubuntu*

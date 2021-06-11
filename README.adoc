@@ -14,9 +14,9 @@ We are constantly improving the scripts and try to get rid of the remaining issu
 
 All our **FileMaker**-based projects and products are prefixed with an **F** and the **T** is for **tools, technology, tipps&tricks, techniques** or open **templates** for the community. These files are basically examples and demonstrations where you can copy stuff from and include it your individual apps and solutions. 
 
-[Browse all our FT repos](https://github.com/fmgarage?q=ft-)
+Browse all our FT repos: https://github.com/fmgarage?q=ft-
 
-If you are looking for other ways to run a FileMaker Server for Linux, check out our [regarding repos](https://github.com/fmgarage?q=ft-fms-).
+If you are looking for other ways to run a FileMaker Server for Linux, check out our regarding repos: https://github.com/fmgarage?q=ft-fms-
 
 
 * <<Installation on macOS>>

@@ -52,23 +52,6 @@ services:
     stdin_open: true
     tty: true
 
-  reverse:
-    container_name: reverse
-    hostname: reverse
-    image: nginx
-    ports:
-      - 80:80
-      - 443:443
-      - 5003:5003
-      - 16000:16000
-    networks:
-      fms:
-        ipv4_address: 172.20.0.50
-    volumes:
-      - ./nginx_config:/etc/nginx
-      - ./nginx_cert/:/etc/ssl/fmg/
-    # command: bash
-
 networks:
   fms:
     external:

@@ -12,9 +12,10 @@ assisted_install=$ASSISTED_INSTALL
 fms_admin_user=$FMS_ADMIN_USER
 fms_admin_pass=$FMS_ADMIN_PASS
 package_remove=$PACKAGE_REMOVE
+timezone=$TIMEZONE
 
 # unset envs
-unset CERT_CERT CERT_BUNDLE CERT_KEY ASSISTED_INSTALL FMS_ADMIN_USER FMS_ADMIN_PASS PACKAGE_REMOVE || exit 1
+unset CERT_CERT CERT_BUNDLE CERT_KEY ASSISTED_INSTALL FMS_ADMIN_USER FMS_ADMIN_PASS PACKAGE_REMOVE TIMEZONE || exit 1
 
 # color prompt global
 echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >>/etc/bashrc
@@ -24,6 +25,15 @@ yum install centos-release-scl deltarpm -y || exit 1
 
 # update
 yum update -y
+
+# set timezone
+printf "\ntimezone from host: %s \n\n" "$timezone"
+timedatectl set-timezone "$timezone"  || {
+  printf "error while setting timezone\n"
+  exit 1
+}
+#ln -fs /usr/share/zoneinfo/"${timezone}" /etc/localtime
+#yum install -y tzdata
 
 # pre packages, possibly omit sudo, autofs
 yum install bash-completion firewalld nano policycoreutils net-tools httpd24 httpd24-mod_ssl -y || {

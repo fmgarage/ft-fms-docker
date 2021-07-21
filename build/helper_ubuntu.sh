@@ -13,18 +13,30 @@ assisted_install=$ASSISTED_INSTALL
 fms_admin_user=$FMS_ADMIN_USER
 fms_admin_pass=$FMS_ADMIN_PASS
 package_remove=$PACKAGE_REMOVE
+timezone=$TIMEZONE
 
 # unset envs
-unset CERT_CERT CERT_BUNDLE CERT_KEY ASSISTED_INSTALL FMS_ADMIN_USER FMS_ADMIN_PASS PACKAGE_REMOVE || exit 1
+unset CERT_CERT CERT_BUNDLE CERT_KEY ASSISTED_INSTALL FMS_ADMIN_USER FMS_ADMIN_PASS PACKAGE_REMOVE TIMEZONE || exit 1
 
 # color prompt global
 echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >>/etc/bashrc
 
 # update
-apt update && apt upgrade -y
+apt-get update && apt-get upgrade -y
+
+# set timezone
+printf "\ntimezone from host: %s \n\n" "$timezone"
+apt-get install -y tzdata
+timedatectl set-timezone "$timezone"  || {
+  printf "error while setting timezone\n"
+  exit 1
+}
+dpkg-reconfigure --frontend noninteractive tzdata
+#ln -fs /usr/share/zoneinfo/"${timezone}" /etc/localtime
+
 
 # pre packages, possibly omit sudo, autofs
-apt install bash-completion nano net-tools apt-utils ubuntu-advantage-tools acl -y || {
+apt-get install bash-completion nano net-tools apt-utils ubuntu-advantage-tools acl -y || {
   printf "error while installing pre-packages\n"
   exit 1
 }
@@ -37,7 +49,7 @@ if [[ ! $package ]]; then
 fi
 
 # install filemaker_server
-FM_ASSISTED_INSTALL="${build_dir_mount}""${assisted_install}" apt install "${package}" -y || {
+FM_ASSISTED_INSTALL="${build_dir_mount}""${assisted_install}" apt-get install "${package}" -y || {
   echo "error while installing filemaker server"
   exit 1
 }

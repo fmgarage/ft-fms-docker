@@ -3,6 +3,9 @@
 
 # todo check if root
 
+# todo
+#set -eou pipefail
+
 # check docker
 docker -v | grep -q version || {
   printf "Docker does not appear to run, exiting.\n"
@@ -100,7 +103,7 @@ esac
 echo "ID=${instance_id}" >../.env
 
 # Load paths
-source ../common/paths.sh
+source "$pwd"/../common/paths.sh
 
 # download filemaker_server package
 package_remove=0
@@ -131,12 +134,12 @@ if [[ ! $package ]]; then
   image_name=centos-fms-19_2
   # todo pin version tag / digest
   base_image=jrei/systemd-centos:7
-  helper_script="helper.sh"
+  helper_script="helper_centos.sh"
 fi
 
 plines=$(wc -l <<<"$package")
 if [[ $plines -gt 1 ]]; then
-  printf "%s fmserver packages found, 1 expected" "$plines"
+  printf "%s fmserver packages found, 1 expected\n" "$plines"
   exit 1
 fi
 
@@ -147,6 +150,12 @@ service_name=fms
 container_name=fms-${instance_id}
 build_image_name=fmsinstall
 date=$(date +%Y-%m-%d)
+source ../common/get_tz.sh
+if ! timezone=$(get_tz); then
+  >&2 echo "error getting timezone\n"
+  exit 1
+fi
+
 
 # check if container names are in use
 old_container=0
@@ -187,8 +196,6 @@ if docker ps -aq --filter "name=${build_image_name}" | grep -q .; then
   echo another build container already exists, removing...
   docker stop $build_image_name
   docker rm $build_image_name
-else
-  printf "\n"
 fi
 
 # create bind volumes
@@ -202,7 +209,7 @@ done
 printf "\n\e[36mcreating docker volumes...\e[39m\n"
 for ((i = 0; i < "${#paths[@]}"; i += 2)); do
   docker volume create --driver local -o o=bind -o type=none -o device="$parent_dir/fms-data${paths[$i + 1]}" "${paths[$i]}" || {
-    printf "error while creating docker volumes"
+    printf "error while creating docker volumes\n"
     exit 1
   }
 done
@@ -220,6 +227,7 @@ docker run -d \
   -e ASSISTED_INSTALL="$assisted_install" \
   -e FMS_ADMIN_USER="$admin_user" \
   -e FMS_ADMIN_PASS="$admin_pass" \
+  -e TIMEZONE="$timezone" \
   --tmpfs /tmp \
   --tmpfs /run \
   --tmpfs /run/lock \
@@ -238,14 +246,14 @@ docker run -d \
   -v fms-logs-"${instance_id}":"/opt/FileMaker/FileMaker Server/Logs":delegated \
   -v fms-webpub-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \
   "$base_image" || {
-  printf "error while running build container"
+  printf "error while running build container\n"
   exit 1
 }
 
 # run install script inside build container
 docker exec $build_image_name /root/build/$helper_script
 if [ ! $? ]; then
-  printf "error while installing!"
+  printf "error while installing!\n"
   docker stop $build_image_name
   docker rm $build_image_name
   exit 1
@@ -289,7 +297,7 @@ network=0
 docker network ls -q --filter "name=^fms-net$" | grep -q . && network=1
 case $network in
 0)
-  echo "Network fms-net not found, will be created"
+  echo "Network fms-net not found, will be created\n"
   compose_files="-f ../docker-compose.yml -f ../fms-network.yml"
   ;;
 1)

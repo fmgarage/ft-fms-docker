@@ -11,6 +11,7 @@ paths=(
   "fms-conf-${instance_id}" "/conf/"
   "fms-http-dotconf-${instance_id}" "/HTTPServer/.conf/"
   "fms-http-conf-${instance_id}" "/HTTPServer/conf/"
+  "fms-http-htdocs-${instance_id}" "/HTTPServer/htdocs/"
   "fms-http-logs-${instance_id}" "/HTTPServer/logs/"
   "fms-logs-${instance_id}" "/Logs/"
   "fms-webpub-conf-${instance_id}" "/Web Publishing/conf/"

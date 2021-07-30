@@ -242,6 +242,7 @@ docker run -d \
   -v fms-dbserver-extensions-"${instance_id}":"/opt/FileMaker/FileMaker Server/Database Server/Extensions/":delegated \
   -v fms-http-dotconf-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/.conf":delegated \
   -v fms-http-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/conf":delegated \
+  -v fms-http-htdocs-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/htdocs":delegated \
   -v fms-http-logs-"${instance_id}":"/opt/FileMaker/FileMaker Server/HTTPServer/logs":delegated \
   -v fms-logs-"${instance_id}":"/opt/FileMaker/FileMaker Server/Logs":delegated \
   -v fms-webpub-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/Web Publishing/conf":delegated \

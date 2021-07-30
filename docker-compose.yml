@@ -16,6 +16,7 @@ services:
       - fms-dbserver-extensions:/opt/FileMaker/FileMaker Server/Database Server/Extensions/:delegated
       - fms-http-dotconf:/opt/FileMaker/FileMaker Server/HTTPServer/.conf:delegated
       - fms-http-conf:/opt/FileMaker/FileMaker Server/HTTPServer/conf:delegated
+      - fms-http-htdocs:/opt/FileMaker/FileMaker Server/HTTPServer/htdocs:delegated
       - fms-http-logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs:delegated
       - fms-logs:/opt/FileMaker/FileMaker Server/Logs:delegated
       - fms-webpub-conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf:delegated
@@ -84,6 +85,9 @@ volumes:
     external: true
   fms-http-conf:
     name: fms-http-conf-${ID}
+    external: true
+  fms-http-htdocs:
+    name: fms-http-htdocs-${ID}
     external: true
   fms-http-logs:
     name: fms-http-logs-${ID}

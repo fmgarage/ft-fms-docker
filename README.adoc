@@ -1,9 +1,11 @@
 = ft-fms-docker 
 :experimental:
 
-(was renamed from fmg-dockerfms)
-
 Run FileMaker Server for Linux in Docker Desktop for Mac or Windows. Everything you need to automatically build a ready-to-run Docker image. *Now ready for FMS 19.3/Ubuntu*
+
+IMPORTANT: It looks like it is not possible to run FileMaker Server in a Ubuntu container anymore (with *macOS* at least). FileMaker Server for Linux relies on systemd for managing their services and running containers with systemd inside is highly unusual. We managed to get it to work with a specially prepared image https://hub.docker.com/r/jrei/systemd-ubuntu[jrei/systemd-ubuntu], but with the latest image(s) this breaks. It seems to be related to *cgroups v2* being used by default now and mounting /sys/fs/cgroups/ into the container, which is also something that is not recommended. +
+We couldn't determine the exact reason after some extensive research, so: *Help is welcome!* +
+Give https://github.com/fmgarage/ft-fms-multipass a try if you need a dev environment.
 
 *Windows*: there are currently some issues (see below).
 

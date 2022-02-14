@@ -55,8 +55,7 @@ services:
 
 networks:
   fms:
-    external:
-      name: fms-net
+    name: fms-net
 
 volumes:
   fms-admin-conf:

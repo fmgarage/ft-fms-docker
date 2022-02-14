@@ -125,7 +125,7 @@ fi
 
 # find deb or rpm, set image_name according to installer package
 package=$(find . -name "*.deb")
-image_name=ubuntu-fms-19_3
+image_name=ubuntu-fms-19
 # todo pin version tag / digest
 base_image=jrei/systemd-ubuntu:18.04
 helper_script="helper_ubuntu.sh"

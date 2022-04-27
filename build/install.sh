@@ -127,11 +127,14 @@ fi
 package=$(find . -name "*.deb")
 image_name=ubuntu-fms-19
 # todo pin version tag / digest
-base_image=jrei/systemd-ubuntu:18.04
+# base_image=jrei/systemd-ubuntu:18.04
+# base_image=ubuntu:18.04
+base_image=fms-base:18.04
 helper_script="helper_ubuntu.sh"
+# helper_script="helper_ubuntu_dumb.sh"
 if [[ ! $package ]]; then
   package=$(find . -name "*.rpm")
-  image_name=centos-fms-19_2
+  image_name=centos-fms
   # todo pin version tag / digest
   base_image=jrei/systemd-centos:7
   helper_script="helper_centos.sh"
@@ -145,6 +148,15 @@ fi
 
 # write to .env
 echo "IMAGE=${image_name}" >>../.env
+
+# build base image
+base_image_exists=$(docker images -q ${base_image})
+if [[ ! $base_image_exists  ]] && [[ $base_image != "jrei/systemd-centos:7" ]]; then
+  docker build -t ${base_image} . || {
+    printf "error while building base image\n"
+    exit 1
+  }
+fi
 
 service_name=fms
 container_name=fms-${instance_id}
@@ -217,9 +229,10 @@ done
 printf "\n"
 
 # run build container
+# docker run \
 docker run -d \
   --name $build_image_name \
-  --cap-add=SYS_ADMIN \
+  --privileged \
   -e CERT_CERT="$c_cert" \
   -e CERT_BUNDLE="$c_bundle" \
   -e CERT_KEY="$c_key" \
@@ -228,10 +241,6 @@ docker run -d \
   -e FMS_ADMIN_USER="$admin_user" \
   -e FMS_ADMIN_PASS="$admin_pass" \
   -e TIMEZONE="$timezone" \
-  --tmpfs /tmp \
-  --tmpfs /run \
-  --tmpfs /run/lock \
-  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v "${pwd}":/root/build/ \
   -v fms-admin-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/Admin/conf":delegated \
   -v fms-conf-"${instance_id}":"/opt/FileMaker/FileMaker Server/conf":delegated \
@@ -252,7 +261,7 @@ docker run -d \
 }
 
 # run install script inside build container
-docker exec $build_image_name /root/build/$helper_script
+docker exec -it $build_image_name bash /root/build/$helper_script
 if [ ! $? ]; then
   printf "error while installing!\n"
   docker stop $build_image_name
@@ -275,7 +284,7 @@ rm "$build_success" || exit 1
 
 # docker commit
 printf "\ncommit build container to new image ...\n"
-docker commit -c "EXPOSE 80" -c "EXPOSE 443" -c "EXPOSE 2399" -c "EXPOSE 5003" -c "EXPOSE 16000-16002" \
+docker commit -c "EXPOSE 80" -c "EXPOSE 443" -c "EXPOSE 2399" -c "EXPOSE 5003" \
   --change "ENV CERT_CERT=''" \
   --change "ENV CERT_BUNDLE=''" \
   --change "ENV CERT_KEY=''" \

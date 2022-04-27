@@ -6,7 +6,7 @@ services:
     container_name: fms-${ID}
     hostname: fms
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - fms-admin-conf:/opt/FileMaker/FileMaker Server/Admin/conf:delegated
       - fms-conf:/opt/FileMaker/FileMaker Server/conf:delegated
       - fms-data-backups:/opt/FileMaker/FileMaker Server/Data/Backups/:delegated
@@ -20,24 +20,25 @@ services:
       - fms-http-logs:/opt/FileMaker/FileMaker Server/HTTPServer/logs:delegated
       - fms-logs:/opt/FileMaker/FileMaker Server/Logs:delegated
       - fms-webpub-conf:/opt/FileMaker/FileMaker Server/Web Publishing/conf:delegated
-    tmpfs:
-      - /tmp
-      - /run
-      - /run/lock
-    security_opt:
-      - seccomp:unconfined
+    # tmpfs:
+    #   - /tmp
+    #   - /run
+    #   - /run/lock
+    # security_opt:
+    #   - seccomp:unconfined
     user: root
     environment:
       - container=docker
-    cap_add:
-      - SYS_ADMIN
+    privileged: true
+#    cap_add:
+#      - SYS_ADMIN
 #      - SYS_PTRACE # only for debugging!
     ports:
       - 80:80
       - 443:443
       - 2399:2399
       - 5003:5003
-      - 16000-16002:16000-16002
+      # - 16000-16002:16000-16002
     networks:
       fms:
         ipv4_address: 172.20.0.11

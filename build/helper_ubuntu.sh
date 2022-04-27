@@ -21,27 +21,14 @@ unset CERT_CERT CERT_BUNDLE CERT_KEY ASSISTED_INSTALL FMS_ADMIN_USER FMS_ADMIN_P
 # color prompt global
 echo "PS1='\[\033[02;32m\]\u@\H:\[\033[02;34m\]\w\$\[\033[00m\] '" >>/etc/bashrc
 
-# update
-apt-get update && apt-get upgrade -y
-
 # set timezone
 printf "\ntimezone from host: %s \n\n" "$timezone"
-apt-get install -y tzdata
-timedatectl set-timezone "$timezone"  || {
+ln -fs /usr/share/zoneinfo/"${timezone}" /etc/localtime || {
   printf "error while setting timezone\n"
   exit 1
 }
-dpkg-reconfigure --frontend noninteractive tzdata
-#ln -fs /usr/share/zoneinfo/"${timezone}" /etc/localtime
 
-
-# pre packages, possibly omit sudo, autofs
-apt-get install bash-completion nano net-tools apt-utils ubuntu-advantage-tools acl -y || {
-  printf "error while installing pre-packages\n"
-  exit 1
-}
-
-# download filemaker_server package
+# find filemaker_server package
 package=$(find "$build_dir_mount" -name "*.deb")
 if [[ ! $package ]]; then
   printf "no deb package found\n"
@@ -49,24 +36,21 @@ if [[ ! $package ]]; then
 fi
 
 # install filemaker_server
-FM_ASSISTED_INSTALL="${build_dir_mount}""${assisted_install}" apt-get install "${package}" -y || {
+FM_ASSISTED_INSTALL="${build_dir_mount}""${assisted_install}" DEBIAN_FRONTEND=noninteractive apt install "${package}" -y || {
   echo "error while installing filemaker server"
   exit 1
 }
 
-# check
-systemctl --no-pager || {
-  printf "error while systemctl\n"
-  exit 1
-}
-
 # import cert
-if [[ $c_cert ]] && [[ $c_bundle ]] && [[ $c_key ]]; then
+if [[ $c_cert ]] && [[ $c_bundle ]] && [[ $c_key ]]
+then
   printf "\nimport certificate\n"
   fmsadmin certificate import -yu "${fms_admin_user}" -p "${fms_admin_pass}" --keyfile ${build_dir_mount}"${c_key}" --intermediateCA ${build_dir_mount}"${c_bundle}" ${build_dir_mount}"${c_cert}" || {
     printf "error while installing certificates\n"
     exit 1
   }
+else
+  echo "no certificate found, proceeding..."
 fi
 
 # default fms config
@@ -80,16 +64,9 @@ fmsadmin -u "$fms_admin_user" -p "$fms_admin_pass" -y disable schedule 1 || {
   exit 1
 }
 
-## change systemd unit stop timeout
-#mkdir -p /etc/systemd/system/fmshelper.service.d/
-#cat >/etc/systemd/system/fmshelper.service.d/override.conf <<EOF
-#[Service]
-#TimeoutStopSec=10m
-#EOF
-
 # increase stop timeout to be able close files automatically
 sed -i 's/timeout=20/timeout=30/g'  /opt/FileMaker/etc/init.d/fmshelper || {
-  printf "error while changing fmshelper script\n"
+  printf "error while updating fmshelper script\n"
   exit 1
 }
 

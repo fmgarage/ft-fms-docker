@@ -36,7 +36,6 @@ Download and install the latest version of Docker Desktop and make sure docker i
 
 Clone or download the repo and move it to your documents folder. You may rename it to something like
 
-[source,shell]
 ----
 ~/Documents/FMS-Linux
 ----
@@ -44,14 +43,13 @@ Clone or download the repo and move it to your documents folder. You may rename 
 [discrete]
 ==== FileMaker Server
 
-Download a copy of the FileMaker Server installer for Linux from your Claris account page, unpack the zip file and move the Red Hat Package Manager (rpm) file to the build folder in the repo. You can also put a link into the config.txt instead, the installer will be downloaded then.
+Download a copy of the FileMaker Server installer for Linux from your Claris account page, unpack the zip file and move the `.deb` package file to the `build` folder:
 
-With the current version of the installer it will look like this:
+----
+~/fms/build/filemaker-server_19.4.2.204_amd64.deb
+----
 
-[source,shell]
-----
-~/Documents/FMS-Linux/build/filemaker_server-19.2.1-23.x86_64.rpm
-----
+You can also put a link into the config.txt instead, the installer will be downloaded then.
 
 You can adjust the settings in the _Assisted Install.txt_ file, but you don't need to. The server admin console login will be admin/admin then, which can be changed later.
 

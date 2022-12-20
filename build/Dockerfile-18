@@ -1,7 +1,7 @@
 # by Claris
 # fmg: added tzdata
 
-FROM ubuntu:18.04
+FROM amd64/ubuntu:18.04
 
 # update all software download sources
 RUN DEBIAN_FRONTEND=noninteractive apt-get update

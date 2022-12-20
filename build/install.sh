@@ -97,7 +97,7 @@ case $user_input in
   instance_id=$user_input
   ;;
 esac
-#done
+
 
 # write to .env
 echo "ID=${instance_id}" >../.env
@@ -127,9 +127,31 @@ fi
 package=$(find . -name "*.deb")
 image_name=ubuntu-fms-19
 # todo pin version tag / digest
-# base_image=jrei/systemd-ubuntu:18.04
-# base_image=ubuntu:18.04
-base_image=fms-base:18.04
+
+# query required Ubuntu version
+printf "Please enter which Ubuntu version you require:\n"
+printf "  [0] Ubuntu 18.04 (up to filemaker-server 19.4, incl. 19.5 for Ubuntu 18)\n"
+printf "  [1] Ubuntu 20.04 (since filemaker-server 19.6, incl. 19.5 for Ubuntu 20)\n"
+read -r user_input
+
+case $user_input in
+0)
+  # Ubuntu 18.04
+  base_image=fms-base:18.04
+  dockerfile=Dockerfile-18
+  ;;
+1)
+  # Ubuntu 20.04
+  base_image=fms-base:20.04
+  dockerfile=Dockerfile-20
+  ;;
+*)
+  printf "please choose between 0 or 1"
+  exit 1
+  ;;
+esac
+
+
 helper_script="helper_ubuntu.sh"
 # helper_script="helper_ubuntu_dumb.sh"
 if [[ ! $package ]]; then
@@ -152,7 +174,7 @@ echo "IMAGE=${image_name}" >>../.env
 # build base image
 base_image_exists=$(docker images -q ${base_image})
 if [[ ! $base_image_exists  ]] && [[ $base_image != "jrei/systemd-centos:7" ]]; then
-  docker build -t ${base_image} . || {
+  docker build -t ${base_image} -f ${dockerfile} . || {
     printf "error while building base image\n"
     exit 1
   }
